@@ -264,34 +264,25 @@ const Contact = () => {
         </div>
       </div>
 
-      {/* Map Section */}
-      <div className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Find Us on the Map</h2>
-          <div className="rounded-xl overflow-hidden shadow-lg">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.0788866668!2d125.1644!3d6.1164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32f79f9f9f9f9f9f%3A0x9f9f9f9f9f9f9f9f!2sLagao%2C%20General%20Santos%20City%2C%20South%20Cotabato!5e0!3m2!1sen!2sph!4v1234567890"
-              width="100%"
-              height="400"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Socsargen County Hospital Location"
-              className="w-full"
-            ></iframe>
-          </div>
-          <div className="mt-4 text-center">
-            <a
-              href="https://www.google.com/maps/search/L.+Arradaza+St.,+Bula-Lagao+Road,+Lagao,+General+Santos+City,+Philippines,+9500"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary-600 hover:underline font-medium"
-            >
-              Open in Google Maps
-            </a>
-          </div>
+      {/* Find Us on the Map Section */}
+      <div className="bg-white">
+        <div className="text-center py-10">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Find Us on the Map</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto px-4">
+            Visit us at Socsargen County Hospital in Lagao, General Santos City
+          </p>
         </div>
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5610.317122515964!2d125.18693377253548!3d6.118144569811807!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32f79fb707dc388d%3A0x3dc68b9d61e2c8c4!2sSocsargen%20County%20Hospital!5e0!3m2!1sen!2sph!4v1768029721585!5m2!1sen!2sph"
+          width="100%"
+          height="400"
+          style={{ border: 0 }}
+          allowFullScreen=""
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Socsargen County Hospital Location"
+          className="w-full"
+        ></iframe>
       </div>
     </div>
   );

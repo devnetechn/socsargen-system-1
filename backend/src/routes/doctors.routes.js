@@ -9,7 +9,8 @@ const {
   getDepartments,
   createDoctor,
   updateDoctor,
-  addDoctorSchedule
+  addDoctorSchedule,
+  deleteDoctor
 } = require('../controllers/doctors.controller');
 
 // Public routes
@@ -23,5 +24,6 @@ router.get('/:id/schedule', getDoctorSchedule);
 router.post('/', authenticate, authorize('admin'), createDoctor);
 router.put('/:id', authenticate, authorize('admin'), updateDoctor);
 router.post('/:id/schedule', authenticate, authorize('admin'), addDoctorSchedule);
+router.delete('/:id', authenticate, authorize('admin'), deleteDoctor);
 
 module.exports = router;

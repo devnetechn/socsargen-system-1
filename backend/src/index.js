@@ -6,12 +6,18 @@ const morgan = require('morgan');
 const http = require('http');
 const { Server } = require('socket.io');
 
+const path = require('path');
+
 // Import routes
 const authRoutes = require('./routes/auth.routes');
 const doctorsRoutes = require('./routes/doctors.routes');
 const appointmentsRoutes = require('./routes/appointments.routes');
 const newsRoutes = require('./routes/news.routes');
 const servicesRoutes = require('./routes/services.routes');
+const uploadRoutes = require('./routes/upload.routes');
+const jobsRoutes = require('./routes/jobs.routes');
+const applicationsRoutes = require('./routes/applications.routes');
+const usersRoutes = require('./routes/users.routes');
 
 // Import services
 const { handleChatMessage, saveMessage } = require('./services/chat.service');
@@ -52,6 +58,9 @@ if (process.env.NODE_ENV !== 'production') {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 // ===========================================
 // API ROUTES
 // ===========================================
@@ -72,6 +81,10 @@ app.use('/api/doctors', doctorsRoutes);
 app.use('/api/appointments', appointmentsRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/services', servicesRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/jobs', jobsRoutes);
+app.use('/api/applications', applicationsRoutes);
+app.use('/api/users', usersRoutes);
 
 // ===========================================
 // SOCKET.IO CHAT HANDLERS

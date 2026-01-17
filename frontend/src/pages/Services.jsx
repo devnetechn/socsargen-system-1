@@ -1,68 +1,360 @@
+import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { FiSearch, FiChevronLeft, FiChevronRight, FiPhone, FiActivity } from 'react-icons/fi';
 import api from '../utils/api';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+// Default service images based on category/name keywords
+const getDefaultServiceImage = (service) => {
+  const name = (service.name || '').toLowerCase();
+  const category = (service.category || '').toLowerCase();
+
+  // Return placeholder gradient colors based on service type
+  if (name.includes('cardiac') || name.includes('heart') || name.includes('cardio') || category.includes('cardiac')) {
+    return 'from-red-500 to-red-600';
+  }
+  if (name.includes('surgery') || name.includes('surgical') || category.includes('surgical')) {
+    return 'from-blue-500 to-blue-600';
+  }
+  if (name.includes('emergency') || name.includes('urgent') || category.includes('emergency')) {
+    return 'from-orange-500 to-orange-600';
+  }
+  if (name.includes('lab') || name.includes('diagnostic') || category.includes('diagnostic')) {
+    return 'from-purple-500 to-purple-600';
+  }
+  if (name.includes('therapy') || name.includes('rehab') || category.includes('therapy')) {
+    return 'from-teal-500 to-teal-600';
+  }
+  if (name.includes('icu') || name.includes('intensive') || category.includes('critical')) {
+    return 'from-rose-500 to-rose-600';
+  }
+  if (name.includes('cancer') || name.includes('oncology')) {
+    return 'from-pink-500 to-pink-600';
+  }
+  if (name.includes('dental')) {
+    return 'from-cyan-500 to-cyan-600';
+  }
+  if (name.includes('radiology') || name.includes('imaging') || name.includes('mri')) {
+    return 'from-indigo-500 to-indigo-600';
+  }
+  return 'from-green-500 to-green-600';
+};
+
 const Services = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const tabsContainerRef = useRef(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+
+  // Fetch categories for filter tabs
+  const { data: categories } = useQuery({
+    queryKey: ['serviceCategories'],
+    queryFn: () => api.get('/services/categories').then(res => res.data)
+  });
+
+  // Fetch all services
   const { data: services, isLoading } = useQuery({
     queryKey: ['services'],
     queryFn: () => api.get('/services').then(res => res.data)
   });
 
-  const getIcon = (icon) => {
-    const icons = {
-      emergency: '🚑',
-      outpatient: '🩺',
-      lab: '🔬',
-      radiology: '📷',
-      pharmacy: '💊',
-      surgery: '🏥'
-    };
-    return icons[icon] || '⚕️';
+  // Filter services by search term and category
+  const filteredServices = services?.filter(service => {
+    const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = !selectedCategory || service.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Group services by category
+  const groupedServices = filteredServices?.reduce((acc, service) => {
+    const cat = service.category || 'General';
+    if (!acc[cat]) {
+      acc[cat] = [];
+    }
+    acc[cat].push(service);
+    return acc;
+  }, {});
+
+  // Check scroll position for arrow visibility
+  const checkScrollPosition = () => {
+    if (tabsContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsContainerRef.current;
+      setShowLeftArrow(scrollLeft > 0);
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    checkScrollPosition();
+    window.addEventListener('resize', checkScrollPosition);
+    return () => window.removeEventListener('resize', checkScrollPosition);
+  }, [categories]);
+
+  const scrollTabs = (direction) => {
+    if (tabsContainerRef.current) {
+      const scrollAmount = 200;
+      tabsContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+      setTimeout(checkScrollPosition, 300);
+    }
   };
 
   return (
-    <div className="py-12">
+    <div className="py-12 bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold mb-4">Our Services</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Socsargen Hospital offers comprehensive healthcare services to meet all your medical needs with state-of-the-art facilities and expert medical staff.
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-bold mb-4 text-green-800">Our Services</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+            Socsargen County Hospital offers comprehensive healthcare services with state-of-the-art facilities and expert medical professionals.
           </p>
         </div>
 
-        {/* Services Grid */}
+        {/* Search Bar */}
+        <div className="mb-6 max-w-2xl mx-auto">
+          <div className="relative">
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
+            <input
+              type="text"
+              placeholder="Search services..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 border-2 border-green-200 rounded-full focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all text-gray-700"
+            />
+          </div>
+        </div>
+
+        {/* Category Filter Tabs */}
+        {categories && categories.length > 0 && (
+          <div className="mb-8 relative">
+            <div className="flex items-center">
+              {/* Left Arrow */}
+              {showLeftArrow && (
+                <button
+                  onClick={() => scrollTabs('left')}
+                  className="absolute left-0 z-10 bg-white shadow-md rounded-full p-2 text-green-600 hover:bg-green-50 transition-colors"
+                  aria-label="Scroll left"
+                >
+                  <FiChevronLeft className="text-xl" />
+                </button>
+              )}
+
+              {/* Scrollable Tabs Container */}
+              <div
+                ref={tabsContainerRef}
+                onScroll={checkScrollPosition}
+                className="flex gap-2 overflow-x-auto scrollbar-hide py-2 px-8 mx-auto"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {/* All Categories Tab */}
+                <button
+                  onClick={() => setSelectedCategory('')}
+                  className={`px-5 py-2.5 rounded-full whitespace-nowrap font-medium transition-all text-sm ${
+                    selectedCategory === ''
+                      ? 'bg-green-600 text-white shadow-lg shadow-green-200'
+                      : 'bg-white text-green-700 border-2 border-green-200 hover:border-green-400 hover:bg-green-50'
+                  }`}
+                >
+                  All Services
+                </button>
+
+                {/* Category Tabs */}
+                {categories?.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-5 py-2.5 rounded-full whitespace-nowrap font-medium transition-all text-sm ${
+                      selectedCategory === cat
+                        ? 'bg-green-600 text-white shadow-lg shadow-green-200'
+                        : 'bg-white text-green-700 border-2 border-green-200 hover:border-green-400 hover:bg-green-50'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Right Arrow */}
+              {showRightArrow && (
+                <button
+                  onClick={() => scrollTabs('right')}
+                  className="absolute right-0 z-10 bg-white shadow-md rounded-full p-2 text-green-600 hover:bg-green-50 transition-colors"
+                  aria-label="Scroll right"
+                >
+                  <FiChevronRight className="text-xl" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Loading State */}
         {isLoading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600"></div>
+          </div>
+        ) : filteredServices?.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="bg-white rounded-xl p-8 shadow-sm max-w-md mx-auto">
+              <FiActivity className="text-5xl text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500 text-lg">No services found matching your criteria.</p>
+              <button
+                onClick={() => { setSearchTerm(''); setSelectedCategory(''); }}
+                className="mt-4 text-green-600 hover:text-green-700 font-medium"
+              >
+                Clear filters
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services?.map((service) => (
-              <div key={service.id} className="card hover:shadow-lg transition group">
-                <div className="text-5xl mb-4 group-hover:scale-110 transition">
-                  {getIcon(service.icon)}
+          /* Services Display */
+          <div className="space-y-10">
+            {selectedCategory ? (
+              /* Single Category View */
+              <div>
+                <h2 className="text-2xl font-bold text-green-800 mb-6 flex items-center gap-3">
+                  <span className="w-2 h-8 bg-green-500 rounded-full"></span>
+                  {selectedCategory}
+                  <span className="text-sm font-normal text-gray-500">
+                    ({filteredServices?.length} service{filteredServices?.length !== 1 ? 's' : ''})
+                  </span>
+                </h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredServices?.map((service) => (
+                    <ServiceCard
+                      key={service.id}
+                      service={service}
+                    />
+                  ))}
                 </div>
-                <h3 className="text-xl font-semibold mb-3">{service.name}</h3>
-                <p className="text-gray-600">{service.description}</p>
               </div>
-            ))}
+            ) : (
+              /* All Categories Grouped View */
+              Object.entries(groupedServices || {}).map(([category, catServices]) => (
+                <div key={category}>
+                  <h2 className="text-2xl font-bold text-green-800 mb-6 flex items-center gap-3">
+                    <span className="w-2 h-8 bg-green-500 rounded-full"></span>
+                    {category}
+                    <span className="text-sm font-normal text-gray-500">
+                      ({catServices.length} service{catServices.length !== 1 ? 's' : ''})
+                    </span>
+                  </h2>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {catServices.map((service) => (
+                      <ServiceCard
+                        key={service.id}
+                        service={service}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
 
         {/* Contact CTA */}
-        <div className="mt-16 bg-primary-50 rounded-lg p-8 text-center">
+        <div className="mt-16 bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Need More Information?</h2>
-          <p className="text-gray-600 mb-6">
-            Contact us to learn more about our services or to schedule a consultation.
+          <p className="text-green-100 mb-6 max-w-xl mx-auto">
+            Contact us to learn more about our services or to schedule a consultation with our medical experts.
           </p>
           <div className="flex justify-center gap-4 flex-wrap">
-            <a href="tel:0831234567" className="btn btn-primary">
-              Call Us: (083) 123-4567
+            <a
+              href="tel:553-8906"
+              className="inline-flex items-center gap-2 bg-white text-green-700 px-6 py-3 rounded-full font-semibold hover:bg-green-50 transition"
+            >
+              <FiPhone /> Call: 553-8906
+            </a>
+            <a
+              href="/contact"
+              className="inline-flex items-center gap-2 border-2 border-white text-white px-6 py-3 rounded-full font-semibold hover:bg-white/10 transition"
+            >
+              Contact Us
             </a>
           </div>
         </div>
       </div>
+
     </div>
+  );
+};
+
+// Helper function to create slug from service name
+const createSlug = (name) => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+};
+
+// Service Card Component
+const ServiceCard = ({ service }) => {
+  const gradientColor = getDefaultServiceImage(service);
+  const slug = createSlug(service.name);
+
+  return (
+    <Link
+      to={`/services/${slug}`}
+      className="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group cursor-pointer transform hover:-translate-y-1 block"
+    >
+      {/* Card Image/Header */}
+      <div className={`h-40 bg-gradient-to-br ${gradientColor} relative overflow-hidden`}>
+        {service.imageUrl ? (
+          <img
+            src={`${API_URL}${service.imageUrl}`}
+            alt={service.name}
+            className="w-full h-full object-cover"
+            style={{ objectPosition: 'top' }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <FiActivity className="text-white/30 text-6xl" />
+          </div>
+        )}
+        {/* Overlay on hover */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+          <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-green-600 px-4 py-2 rounded-full text-sm">
+            View Details
+          </span>
+        </div>
+        {/* Featured Badge */}
+        {service.isFeatured && (
+          <div className="absolute top-3 right-3">
+            <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded">
+              FEATURED
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Card Body */}
+      <div className="p-5">
+        <div className="mb-2">
+          <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded">
+            {service.category || 'General'}
+          </span>
+        </div>
+        <h3 className="font-bold text-lg text-gray-800 mb-2 group-hover:text-green-600 transition-colors">
+          {service.name}
+        </h3>
+        {service.description ? (
+          <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
+            {service.description}
+          </p>
+        ) : (
+          <p className="text-gray-400 text-sm italic">
+            Click to learn more about this service.
+          </p>
+        )}
+      </div>
+    </Link>
   );
 };
 
