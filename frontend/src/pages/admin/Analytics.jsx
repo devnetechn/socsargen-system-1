@@ -108,34 +108,70 @@ const AdminAnalytics = () => {
     new Date(apt.createdAt) >= last7Days
   )?.length || 0;
 
-  // Export report function
+  // Export report function - CSV format
   const exportReport = () => {
-    const reportData = {
-      generatedAt: new Date().toISOString(),
-      dateRange,
-      summary: {
-        totalAppointments,
-        pendingAppointments,
-        approvedAppointments,
-        completedAppointments,
-        cancelledAppointments,
-        totalDoctors,
-        availableDoctors,
-        totalNews,
-        publishedNews,
-        draftNews,
-        totalJobs,
-        activeJobs
-      },
-      appointmentsByDoctor: Object.fromEntries(topDoctors),
-      appointmentsByDay: dayNames.map((day, i) => ({ day, count: appointmentsByDay[i] }))
-    };
+    const today = new Date().toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    });
 
-    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+    // Build CSV content
+    let csv = '';
+
+    // Header
+    csv += 'SOCSARGEN COUNTY HOSPITAL\n';
+    csv += 'ANALYTICS REPORT\n';
+    csv += `Generated: ${today}\n`;
+    csv += `Date Range: ${dateRange === 'week' ? 'Last 7 Days' : dateRange === 'month' ? 'Last 30 Days' : dateRange === 'year' ? 'Last Year' : 'All Time'}\n`;
+    csv += '\n';
+
+    // Summary Section
+    csv += '=== SUMMARY ===\n';
+    csv += 'Category,Value\n';
+    csv += `Total Appointments,${totalAppointments}\n`;
+    csv += `Pending Appointments,${pendingAppointments}\n`;
+    csv += `Approved Appointments,${approvedAppointments}\n`;
+    csv += `Completed Appointments,${completedAppointments}\n`;
+    csv += `Cancelled/Rejected,${cancelledAppointments}\n`;
+    csv += `Total Doctors,${totalDoctors}\n`;
+    csv += `Available Doctors,${availableDoctors}\n`;
+    csv += `Total News Articles,${totalNews}\n`;
+    csv += `Published Articles,${publishedNews}\n`;
+    csv += `Draft Articles,${draftNews}\n`;
+    csv += `Total Job Postings,${totalJobs}\n`;
+    csv += `Active Jobs,${activeJobs}\n`;
+    csv += '\n';
+
+    // Appointments by Doctor
+    csv += '=== TOP DOCTORS BY APPOINTMENTS ===\n';
+    csv += 'Doctor Name,Appointments\n';
+    topDoctors.forEach(([name, count]) => {
+      csv += `"${name}",${count}\n`;
+    });
+    csv += '\n';
+
+    // Appointments by Day
+    csv += '=== APPOINTMENTS BY DAY OF WEEK ===\n';
+    csv += 'Day,Appointments\n';
+    dayNames.forEach((day, i) => {
+      csv += `${day},${appointmentsByDay[i]}\n`;
+    });
+    csv += '\n';
+
+    // Recent Appointments
+    if (allAppointments?.length > 0) {
+      csv += '=== RECENT APPOINTMENTS ===\n';
+      csv += 'Patient,Doctor,Date,Time,Status\n';
+      allAppointments.slice(0, 20).forEach(apt => {
+        csv += `"${apt.patient?.fullName || 'N/A'}","${apt.doctor?.fullName || 'N/A'}",${new Date(apt.appointmentDate).toLocaleDateString()},${apt.appointmentTime},${apt.status}\n`;
+      });
+    }
+
+    // Download CSV
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `analytics-report-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `SCH-Analytics-Report-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };

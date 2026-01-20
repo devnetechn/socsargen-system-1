@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fi';
 import { useAuth } from '../hooks/useAuth';
 import api from '../utils/api';
+import { getBaseURL } from '../utils/url';
 
 const MyApplications = () => {
   const { user } = useAuth();
@@ -338,7 +339,7 @@ const MyApplications = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-500 mb-2">Your Resume</p>
                     <a
-                      href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${selectedApp.resumeUrl}`}
+                      href={`${getBaseURL()}${selectedApp.resumeUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-primary-600 hover:underline"

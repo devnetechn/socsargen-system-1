@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { FiMessageSquare, FiSend, FiUser, FiCheck, FiClock, FiAlertCircle, FiArrowLeft } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { getSocketURL } from '../../utils/url';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = getSocketURL();
 
 const AdminChat = () => {
   const [socket, setSocket] = useState(null);
@@ -14,6 +15,12 @@ const AdminChat = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
+
+  // Get current staff user
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const staffName = user.first_name && user.last_name
+    ? `${user.first_name} ${user.last_name}`
+    : user.email || 'Staff';
 
   // Connect to socket and join staff room
   useEffect(() => {
@@ -25,7 +32,8 @@ const AdminChat = () => {
 
     newSocket.on('connect', () => {
       setIsConnected(true);
-      newSocket.emit('join_staff');
+      // Send staff info when joining
+      newSocket.emit('join_staff', { staffName, staffId: user.id });
       toast.success('Connected to chat system');
     });
 
@@ -41,8 +49,9 @@ const AdminChat = () => {
         if (exists) return prev;
         return [...prev, {
           ...data,
-          messages: [],
-          unread: true
+          messages: data.messages || [],
+          unread: true,
+          lastMessage: data.lastMessage || 'Waiting for response...'
         }];
       });
       toast('New chat needs attention!', { icon: '🔔' });
@@ -107,16 +116,18 @@ const AdminChat = () => {
     const message = input.trim();
     setInput('');
 
-    // Send to user
+    // Send to user with staff name
     socket.emit('staff_response', {
       targetSessionId: selectedChat.sessionId,
-      message
+      message,
+      staffName
     });
 
     // Add to local messages
     const newMessage = {
       text: message,
       sender: 'staff',
+      staffName,
       timestamp: new Date()
     };
 

@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 
 // Layout Components
+import ScrollToTop from './components/ScrollToTop';
 import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
 import ChatWidget from './components/Chat/ChatWidget';
@@ -52,6 +53,9 @@ import HRApplications from './pages/hr/Applications';
 function App() {
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Scroll to top on route change */}
+      <ScrollToTop />
+
       {/* Skip Link for Accessibility */}
       <a href="#main-content" className="skip-link">
         Skip to main content

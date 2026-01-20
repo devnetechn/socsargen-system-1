@@ -4,8 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { FiPlus, FiEdit2, FiCalendar, FiUser, FiX, FiCheck, FiSearch, FiArrowLeft, FiTrash2, FiUpload, FiCamera } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
+import { getBaseURL } from '../../utils/url';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = getBaseURL();
 
 const AdminDoctors = () => {
   const queryClient = useQueryClient();

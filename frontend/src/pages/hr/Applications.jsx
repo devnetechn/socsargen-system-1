@@ -19,6 +19,7 @@ import {
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
+import { getBaseURL } from '../../utils/url';
 
 const HRApplications = () => {
   const queryClient = useQueryClient();
@@ -225,7 +226,7 @@ const HRApplications = () => {
                       <div className="flex items-center gap-1">
                         {app.resumeUrl && (
                           <a
-                            href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${app.resumeUrl}`}
+                            href={`${getBaseURL()}${app.resumeUrl}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg"
@@ -314,7 +315,7 @@ const HRApplications = () => {
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 mb-2">Resume</h3>
                     <a
-                      href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${selectedApp.resumeUrl}`}
+                      href={`${getBaseURL()}${selectedApp.resumeUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-primary-600 hover:underline"

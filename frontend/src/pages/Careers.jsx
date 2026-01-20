@@ -23,8 +23,9 @@ import {
   FiCheck,
   FiAlertCircle
 } from 'react-icons/fi';
+import { getAPIURL } from '../utils/url';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = getAPIURL();
 
 const Careers = () => {
   const { user } = useAuth();

@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { FiSearch, FiChevronLeft, FiChevronRight, FiPhone, FiActivity } from 'react-icons/fi';
 import api from '../utils/api';
+import { getBaseURL } from '../utils/url';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = getBaseURL();
 
 // Default service images based on category/name keywords
 const getDefaultServiceImage = (service) => {

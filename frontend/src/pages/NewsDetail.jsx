@@ -3,8 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { FiCalendar, FiUser, FiArrowLeft, FiShare2 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
+import { getBaseURL } from '../utils/url';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = getBaseURL();
 
 // Helper to get full image URL
 const getImageUrl = (imageUrl) => {

@@ -186,24 +186,24 @@ const About = () => {
             <div className="grid md:grid-cols-2 gap-12 items-start">
               {/* History Text */}
               <div>
-                <span className="inline-block text-primary-600 text-sm font-semibold uppercase tracking-wider mb-3">
+                <span className="inline-block text-primary-600 text-sm font-semibold uppercase tracking-wider mb-3 w-full text-center md:text-left">
                   Our Story
                 </span>
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6 text-center md:text-left">
                   A Legacy of Healing
                 </h2>
                 <div className="space-y-4 text-gray-600 text-lg leading-relaxed">
-                  <p>
+                  <p className="text-justify">
                     Since our establishment in <strong className="text-primary-700">1992</strong>, Socsargen County Hospital has been at the forefront of healthcare excellence in the SOCCSKSARGEN region.
                   </p>
-                  <p>
+                  <p className="text-justify">
                     As a private, <strong className="text-primary-700">ISO-accredited tertiary hospital</strong> located in the heart of General Santos City, we have been setting the standards of healthcare in Region 12 for over three decades.
                   </p>
-                  <p>
+                  <p className="text-justify">
                     Our commitment to providing quality, compassionate care has made us a trusted healthcare partner for thousands of families across Southern Mindanao.
                   </p>
                 </div>
-                <div className="flex items-center gap-3 mt-6 text-gray-500">
+                <div className="flex items-center justify-center md:justify-start gap-3 mt-6 text-gray-500">
                   <FiMapPin className="w-5 h-5 text-primary-600" />
                   <span>General Santos City, SOCCSKSARGEN Region</span>
                 </div>

@@ -21,6 +21,7 @@ import {
   FiChevronRight
 } from 'react-icons/fi';
 import api from '../utils/api';
+import { getBaseURL } from '../utils/url';
 import hmoPartnersImg from '../assets/hmo-partners.jpg';
 import hospitalAerialImg from '../assets/hospital-aerial.jpg';
 import doctor1Img from '../assets/doctor1.jpg';
@@ -65,38 +66,38 @@ const Home = () => {
   const heroSlides = [
     {
       image: hero1Img,
-      alt: 'Catheterization Lab',
-      facility: 'Catheterization Lab',
+      alt: 'Catheterization Laboratory',
+      facility: 'Catheterization Laboratory',
       description: 'State-of-the-art cardiac care with minimally invasive diagnostic tests and treatment procedures.',
-      link: '/services'
+      link: '/services/catheterization-laboratory'
     },
     {
       image: hero3Img,
-      alt: 'Emergency Room',
-      facility: 'Emergency Room',
+      alt: 'Emergency Services',
+      facility: 'Emergency Services',
       description: '24/7 Emergency Department equipped with advanced life-saving equipment and experienced physicians.',
-      link: '/services'
+      link: '/services/emergency-services'
     },
     {
       image: hero4Img,
-      alt: 'Intensive Care Unit',
-      facility: 'Intensive Care Unit',
+      alt: 'ICU',
+      facility: 'ICU',
       description: 'Advanced ICU with monitoring systems, ventilators, and round-the-clock specialized care.',
-      link: '/services'
+      link: '/services/icu'
     },
     {
       image: hero5Img,
-      alt: 'Operating Rooms',
-      facility: 'Operating Rooms',
+      alt: 'OR/DR',
+      facility: 'OR/DR',
       description: 'Modern surgical suites with cutting-edge technology for various procedures.',
-      link: '/services'
+      link: '/services/or-dr'
     },
     {
       image: hero6Img,
-      alt: 'Diagnostic Imaging',
-      facility: 'Diagnostic Imaging',
+      alt: 'Radiology / Imaging',
+      facility: 'Radiology / Imaging',
       description: 'Complete imaging services including CT Scan, MRI, X-Ray, and Ultrasound.',
-      link: '/services'
+      link: '/services/radiology-imaging'
     }
   ];
 
@@ -264,24 +265,6 @@ const Home = () => {
             </div>
           </div>
         </div>
-
-        {/* Left Arrow Button - Hidden on mobile */}
-        <button
-          onClick={goToPrevSlide}
-          className="hidden md:flex absolute left-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full items-center justify-center text-white transition-all duration-300 group"
-          aria-label="Previous slide"
-        >
-          <FiChevronLeft className="w-6 h-6 group-hover:scale-110 transition-transform" />
-        </button>
-
-        {/* Right Arrow Button - Hidden on mobile */}
-        <button
-          onClick={goToNextSlide}
-          className="hidden md:flex absolute right-8 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full items-center justify-center text-white transition-all duration-300 group"
-          aria-label="Next slide"
-        >
-          <FiChevronRight className="w-6 h-6 group-hover:scale-110 transition-transform" />
-        </button>
 
         {/* Slide Indicators (Dots) */}
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
@@ -946,7 +929,7 @@ const Home = () => {
 // Featured News Slider - Full-width background image/video slider with auto-rotate
 const FeaturedNewsSlider = ({ newsItems }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_URL = getBaseURL();
 
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return null;
@@ -1062,7 +1045,7 @@ const FeaturedNewsSlider = ({ newsItems }) => {
 const NewsSlider = ({ newsItems }) => {
   const [startIndex, setStartIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(3);
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_URL = getBaseURL();
 
   // Update visible count based on screen size
   useEffect(() => {

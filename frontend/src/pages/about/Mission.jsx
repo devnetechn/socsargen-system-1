@@ -119,7 +119,7 @@ const Mission = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <blockquote className="text-2xl md:text-3xl font-light italic mb-6">
-              "Here, you're more than just a patient, you're family."
+              "Leading with Innovation, Serving with Compassion"
             </blockquote>
             <p className="text-primary-200">
               - Socsargen County Hospital

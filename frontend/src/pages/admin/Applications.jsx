@@ -20,6 +20,7 @@ import {
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
+import { getBaseURL } from '../../utils/url';
 
 const AdminApplications = () => {
   const queryClient = useQueryClient();
@@ -262,7 +263,7 @@ const AdminApplications = () => {
                   <div className="flex flex-wrap items-center gap-2">
                     {app.resumeUrl && (
                       <a
-                        href={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${app.resumeUrl}`}
+                        href={`${getBaseURL()}${app.resumeUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-secondary text-sm flex items-center gap-1"
@@ -377,7 +378,7 @@ const ApplicationModal = ({ application, onClose, onStatusUpdate, onDelete, isLo
             <div className="mb-6">
               <h3 className="font-semibold text-lg mb-3">Resume</h3>
               <a
-                href={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${application.resumeUrl}`}
+                href={`${getBaseURL()}${application.resumeUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary inline-flex items-center gap-2"
