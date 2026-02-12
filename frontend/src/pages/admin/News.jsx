@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { FiPlus, FiEdit2, FiTrash2, FiEye, FiEyeOff, FiX, FiFileText, FiUpload, FiImage, FiArrowLeft } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiEye, FiEyeOff, FiX, FiFileText, FiUpload, FiImage, FiArrowLeft, FiVideo } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import { getBaseURL } from '../../utils/url';
@@ -125,6 +125,11 @@ const AdminNews = () => {
                       }`}>
                         {news.isPublished ? 'Published' : 'Draft'}
                       </span>
+                      {news.videoUrl && (
+                        <span className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                          <FiVideo size={12} /> Video
+                        </span>
+                      )}
                     </div>
                     <p className="text-gray-600 text-sm mb-2 line-clamp-2">{news.excerpt}</p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -188,16 +193,21 @@ const AdminNews = () => {
 // News Modal Component
 const NewsModal = ({ news, onClose, onSubmit, isLoading }) => {
   const fileInputRef = useRef(null);
+  const videoInputRef = useRef(null);
   const [formData, setFormData] = useState({
     title: news?.title || '',
     content: news?.content || '',
     excerpt: news?.excerpt || '',
     imageUrl: news?.imageUrl || '',
+    videoUrl: news?.videoUrl || '',
     isPublished: news?.isPublished ?? false
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(news?.imageUrl ? `${API_URL}${news.imageUrl}` : '');
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState(news?.videoUrl ? `${API_URL}${news.videoUrl}` : '');
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleChange = (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -234,10 +244,37 @@ const NewsModal = ({ news, onClose, onSubmit, isLoading }) => {
     }
   };
 
+  const handleVideoSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Only video files are allowed (MP4, WebM, OGG)');
+        return;
+      }
+      if (file.size > 100 * 1024 * 1024) {
+        toast.error('Video too large. Maximum size is 100MB.');
+        return;
+      }
+      setSelectedVideo(file);
+      setVideoPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveVideo = () => {
+    setSelectedVideo(null);
+    setVideoPreviewUrl('');
+    setFormData({ ...formData, videoUrl: '' });
+    if (videoInputRef.current) {
+      videoInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     let imageUrl = formData.imageUrl;
+    let videoUrl = formData.videoUrl;
 
     // Upload image if a new file is selected
     if (selectedFile) {
@@ -261,7 +298,34 @@ const NewsModal = ({ news, onClose, onSubmit, isLoading }) => {
       setUploading(false);
     }
 
-    onSubmit({ ...formData, imageUrl });
+    // Upload video if a new file is selected
+    if (selectedVideo) {
+      setUploading(true);
+      setUploadProgress(0);
+      try {
+        const uploadData = new FormData();
+        uploadData.append('video', selectedVideo);
+
+        const response = await api.post('/upload/video', uploadData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          onUploadProgress: (progressEvent) => {
+            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(progress);
+          }
+        });
+
+        videoUrl = response.data.videoUrl;
+      } catch (error) {
+        toast.error(error.response?.data?.error || 'Failed to upload video.');
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
+
+    onSubmit({ ...formData, imageUrl, videoUrl });
   };
 
   return (
@@ -364,6 +428,70 @@ const NewsModal = ({ news, onClose, onSubmit, isLoading }) => {
                   JPEG, PNG, GIF, WebP (max 5MB)
                 </span>
               </div>
+            </div>
+
+            {/* Video Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Video <span className="text-gray-400">(optional)</span>
+              </label>
+
+              {/* Video Preview */}
+              {videoPreviewUrl ? (
+                <div className="relative mb-3">
+                  <video
+                    src={videoPreviewUrl}
+                    controls
+                    className="w-full rounded-lg max-h-64"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveVideo}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition"
+                    title="Remove video"
+                  >
+                    <FiX size={16} />
+                  </button>
+                </div>
+              ) : null}
+
+              {/* Upload Button */}
+              <div className="flex items-center gap-3">
+                <input
+                  ref={videoInputRef}
+                  type="file"
+                  accept="video/mp4,video/webm,video/ogg"
+                  onChange={handleVideoSelect}
+                  className="hidden"
+                  id="newsVideoUpload"
+                />
+                <label
+                  htmlFor="newsVideoUpload"
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 transition"
+                >
+                  <FiVideo />
+                  {videoPreviewUrl ? 'Change Video' : 'Upload Video'}
+                </label>
+                <span className="text-sm text-gray-500">
+                  MP4, WebM, OGG (max 100MB)
+                </span>
+              </div>
+
+              {/* Upload Progress */}
+              {uploading && uploadProgress > 0 && (
+                <div className="mt-3">
+                  <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
+                    <span>Uploading...</span>
+                    <span>{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-2">

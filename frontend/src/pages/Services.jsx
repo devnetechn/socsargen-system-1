@@ -317,50 +317,54 @@ const ServiceCard = ({ service }) => {
   return (
     <Link
       to={`/services/${slug}`}
-      className="bg-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group cursor-pointer transform hover:-translate-y-1 block"
+      className="bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden group cursor-pointer block"
     >
-      {/* Card Image/Header */}
-      <div className={`h-32 sm:h-40 bg-gradient-to-br ${gradientColor} relative overflow-hidden`}>
+      {/* Large Image Area */}
+      <div className={`h-48 sm:h-56 lg:h-60 bg-gradient-to-br ${gradientColor} relative overflow-hidden`}>
         {service.imageUrl ? (
           <img
             src={`${API_URL}${service.imageUrl}`}
             alt={service.name}
-            className="w-full h-full object-cover"
-            style={{ objectPosition: 'top' }}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            style={{ objectPosition: 'center' }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <FiActivity className="text-white/30 text-4xl sm:text-6xl" />
+            <FiActivity className="text-white/20 text-6xl sm:text-7xl" />
           </div>
         )}
-        {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-          <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-green-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* View Details on hover */}
+        <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500">
+          <span className="inline-flex items-center gap-1.5 text-white font-medium text-xs sm:text-sm bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/30">
             View Details
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
           </span>
         </div>
         {/* Featured Badge */}
         {service.isFeatured && (
-          <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
-            <span className="bg-yellow-400 text-yellow-900 text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+          <div className="absolute top-2.5 sm:top-3 right-2.5 sm:right-3">
+            <span className="bg-yellow-400/90 backdrop-blur-sm text-yellow-900 text-[10px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full shadow-sm">
               FEATURED
             </span>
           </div>
         )}
-      </div>
-
-      {/* Card Body */}
-      <div className="p-3 sm:p-5">
-        <div className="mb-1.5 sm:mb-2">
-          <span className="text-[10px] sm:text-xs font-medium text-green-600 bg-green-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+        {/* Category Badge on image */}
+        <div className="absolute top-2.5 sm:top-3 left-2.5 sm:left-3">
+          <span className="text-[10px] sm:text-xs font-semibold text-white bg-green-600/80 backdrop-blur-sm px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full">
             {service.category || 'General'}
           </span>
         </div>
-        <h3 className="font-bold text-sm sm:text-lg text-gray-800 mb-1 sm:mb-2 group-hover:text-green-600 transition-colors line-clamp-2">
+      </div>
+
+      {/* Card Body */}
+      <div className="p-3.5 sm:p-5">
+        <h3 className="font-bold text-sm sm:text-lg text-gray-800 mb-1 sm:mb-2 group-hover:text-green-600 transition-colors duration-300 line-clamp-2">
           {service.name}
         </h3>
         {service.description ? (
-          <p className="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-2">
+          <p className="text-gray-500 text-xs sm:text-sm leading-relaxed line-clamp-2">
             {service.description}
           </p>
         ) : (

@@ -444,37 +444,61 @@ const Home = () => {
           </div>
 
           {servicesLoading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
               {[...Array(10)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl p-6 animate-pulse">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-full"></div>
+                <div key={i} className="bg-white rounded-xl overflow-hidden animate-pulse">
+                  <div className="h-32 sm:h-40 bg-gray-200"></div>
+                  <div className="p-3 sm:p-4">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-full"></div>
+                  </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
               {(servicesData?.data || servicesData || []).slice(0, 10).map((service, index) => {
                 const slug = (service?.name || 'service')
                   .toLowerCase()
                   .replace(/[^a-z0-9]+/g, '-')
                   .replace(/(^-|-$)/g, '');
+                const name = (service?.name || '').toLowerCase();
+                const category = (service?.category || '').toLowerCase();
+                const gradientColor = name.includes('cardiac') || name.includes('heart') || name.includes('cardio') || category.includes('cardiac') ? 'from-red-500 to-red-600'
+                  : name.includes('surgery') || name.includes('surgical') || category.includes('surgical') ? 'from-blue-500 to-blue-600'
+                  : name.includes('emergency') || name.includes('urgent') || category.includes('emergency') ? 'from-orange-500 to-orange-600'
+                  : name.includes('lab') || name.includes('diagnostic') || category.includes('diagnostic') ? 'from-purple-500 to-purple-600'
+                  : name.includes('therapy') || name.includes('rehab') || category.includes('therapy') ? 'from-teal-500 to-teal-600'
+                  : name.includes('icu') || name.includes('intensive') || category.includes('critical') ? 'from-rose-500 to-rose-600'
+                  : 'from-green-500 to-green-600';
                 return (
                   <Link
                     key={service?.id || index}
                     to={`/services/${slug}`}
-                    className="bg-white rounded-xl p-6 hover:shadow-lg transition-all duration-300 border border-gray-100 group block"
+                    className="bg-white rounded-xl overflow-hidden hover:shadow-xl transition-all duration-500 group block"
                   >
-                    <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-4 text-primary-600 group-hover:bg-primary-500 group-hover:text-white transition-colors duration-300">
-                      {getServiceIcon(service?.icon)}
+                    <div className={`h-32 sm:h-40 bg-gradient-to-br ${gradientColor} relative overflow-hidden`}>
+                      {service?.imageUrl ? (
+                        <img
+                          src={`${getBaseURL()}${service.imageUrl}`}
+                          alt={service?.name}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <FiActivity className="text-white/20 text-4xl sm:text-5xl" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors">
-                      {service?.name || 'Service'}
-                    </h3>
-                    <p className="text-gray-500 text-sm line-clamp-2">
-                      {service?.description || 'Quality healthcare service'}
-                    </p>
+                    <div className="p-3 sm:p-4">
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-800 group-hover:text-primary-600 transition-colors line-clamp-2">
+                        {service?.name || 'Service'}
+                      </h3>
+                      <p className="text-gray-500 text-xs sm:text-sm line-clamp-2 mt-1">
+                        {service?.description || 'Quality healthcare service'}
+                      </p>
+                    </div>
                   </Link>
                 );
               })}
@@ -482,16 +506,16 @@ const Home = () => {
               {(!servicesData || (servicesData?.data || servicesData || []).length === 0) && (
                 <>
                   {[
-                    { id: 'fallback-emergency', name: 'Emergency Care', icon: 'emergency', description: '24/7 emergency medical services' },
-                    { id: 'fallback-outpatient', name: 'Outpatient Services', icon: 'outpatient', description: 'Comprehensive outpatient care' },
-                    { id: 'fallback-lab', name: 'Laboratory', icon: 'lab', description: 'Advanced diagnostic testing' },
-                    { id: 'fallback-radiology', name: 'Radiology', icon: 'radiology', description: 'Medical imaging services' },
-                    { id: 'fallback-pharmacy', name: 'Pharmacy', icon: 'pharmacy', description: 'In-hospital pharmacy' },
-                    { id: 'fallback-surgery', name: 'Surgery', icon: 'surgery', description: 'Surgical procedures' },
-                    { id: 'fallback-cardiology', name: 'Cardiology', icon: 'cardiology', description: 'Heart care services' },
-                    { id: 'fallback-pediatrics', name: 'Pediatrics', icon: 'pediatrics', description: 'Child healthcare' },
-                    { id: 'fallback-obstetrics', name: 'Obstetrics', icon: 'obstetrics', description: 'Maternity services' },
-                    { id: 'fallback-icu', name: 'ICU', icon: 'icu', description: 'Intensive care unit' }
+                    { id: 'fallback-emergency', name: 'Emergency Care', icon: 'emergency', description: '24/7 emergency medical services', gradient: 'from-orange-500 to-orange-600' },
+                    { id: 'fallback-outpatient', name: 'Outpatient Services', icon: 'outpatient', description: 'Comprehensive outpatient care', gradient: 'from-green-500 to-green-600' },
+                    { id: 'fallback-lab', name: 'Laboratory', icon: 'lab', description: 'Advanced diagnostic testing', gradient: 'from-purple-500 to-purple-600' },
+                    { id: 'fallback-radiology', name: 'Radiology', icon: 'radiology', description: 'Medical imaging services', gradient: 'from-indigo-500 to-indigo-600' },
+                    { id: 'fallback-pharmacy', name: 'Pharmacy', icon: 'pharmacy', description: 'In-hospital pharmacy', gradient: 'from-cyan-500 to-cyan-600' },
+                    { id: 'fallback-surgery', name: 'Surgery', icon: 'surgery', description: 'Surgical procedures', gradient: 'from-blue-500 to-blue-600' },
+                    { id: 'fallback-cardiology', name: 'Cardiology', icon: 'cardiology', description: 'Heart care services', gradient: 'from-red-500 to-red-600' },
+                    { id: 'fallback-pediatrics', name: 'Pediatrics', icon: 'pediatrics', description: 'Child healthcare', gradient: 'from-teal-500 to-teal-600' },
+                    { id: 'fallback-obstetrics', name: 'Obstetrics', icon: 'obstetrics', description: 'Maternity services', gradient: 'from-pink-500 to-pink-600' },
+                    { id: 'fallback-icu', name: 'ICU', icon: 'icu', description: 'Intensive care unit', gradient: 'from-rose-500 to-rose-600' }
                   ].map((service) => {
                     const slug = service.name
                       .toLowerCase()
@@ -501,17 +525,22 @@ const Home = () => {
                       <Link
                         key={service.id}
                         to={`/services/${slug}`}
-                        className="bg-white rounded-xl p-6 hover:shadow-lg transition-all duration-300 border border-gray-100 group block"
+                        className="bg-white rounded-xl overflow-hidden hover:shadow-xl transition-all duration-500 group block"
                       >
-                        <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-4 text-primary-600 group-hover:bg-primary-500 group-hover:text-white transition-colors duration-300">
-                          {getServiceIcon(service.icon)}
+                        <div className={`h-32 sm:h-40 bg-gradient-to-br ${service.gradient} relative overflow-hidden`}>
+                          <div className="w-full h-full flex items-center justify-center">
+                            <FiActivity className="text-white/20 text-4xl sm:text-5xl" />
+                          </div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors">
-                          {service.name}
-                        </h3>
-                        <p className="text-gray-500 text-sm">
-                          {service.description}
-                        </p>
+                        <div className="p-3 sm:p-4">
+                          <h3 className="text-sm sm:text-base font-semibold text-gray-800 group-hover:text-primary-600 transition-colors line-clamp-2">
+                            {service.name}
+                          </h3>
+                          <p className="text-gray-500 text-xs sm:text-sm line-clamp-2 mt-1">
+                            {service.description}
+                          </p>
+                        </div>
                       </Link>
                     );
                   })}
@@ -1237,22 +1266,38 @@ const Home = () => {
 // Featured News Slider - Full-width background image/video slider with auto-rotate
 const FeaturedNewsSlider = ({ newsItems }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const videoRefs = useRef({});
   const API_URL = getBaseURL();
 
-  const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return null;
-    if (imageUrl.startsWith('http')) return imageUrl;
-    return `${API_URL}${imageUrl}`;
+  const getMediaUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${API_URL}${url}`;
   };
 
-  // Auto-rotate slides every 5 seconds
+  // Auto-rotate: 10s for videos, 5s for images
   useEffect(() => {
     if (newsItems.length <= 1) return;
-    const timer = setInterval(() => {
+    const currentNews = newsItems[currentSlide];
+    const duration = currentNews?.videoUrl ? 10000 : 5000;
+    const timer = setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % newsItems.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [newsItems.length]);
+    }, duration);
+    return () => clearTimeout(timer);
+  }, [newsItems.length, currentSlide, newsItems]);
+
+  // Handle video play/pause when slide changes
+  useEffect(() => {
+    Object.entries(videoRefs.current).forEach(([idx, video]) => {
+      if (!video) return;
+      if (parseInt(idx) === currentSlide) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }, [currentSlide]);
 
   const goToSlide = (index) => {
     setCurrentSlide(index);
@@ -1278,11 +1323,22 @@ const FeaturedNewsSlider = ({ newsItems }) => {
             index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
           }`}
         >
-          {/* Background Image */}
-          {news.imageUrl ? (
+          {/* Background: Video or Image */}
+          {news.videoUrl ? (
+            <video
+              ref={(el) => { videoRefs.current[index] = el; }}
+              src={getMediaUrl(news.videoUrl)}
+              className="absolute inset-0 w-full h-full object-cover"
+              autoPlay={index === 0}
+              muted
+              loop
+              playsInline
+              preload="auto"
+            />
+          ) : news.imageUrl ? (
             <div
               className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${getImageUrl(news.imageUrl)})` }}
+              style={{ backgroundImage: `url(${getMediaUrl(news.imageUrl)})` }}
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-primary-600 to-primary-800" />
@@ -1383,19 +1439,24 @@ const NewsSlider = ({ newsItems }) => {
     return `${API_URL}${imageUrl}`;
   };
 
-  const canGoPrev = startIndex > 0;
-  const canGoNext = startIndex + visibleCount < newsItems.length;
-
   const prevSlide = () => {
-    if (canGoPrev) {
-      setStartIndex((prev) => prev - 1);
-    }
+    setStartIndex((prev) => {
+      const newIndex = prev - 1;
+      if (newIndex < 0) {
+        return Math.max(0, newsItems.length - visibleCount);
+      }
+      return newIndex;
+    });
   };
 
   const nextSlide = () => {
-    if (canGoNext) {
-      setStartIndex((prev) => prev + 1);
-    }
+    setStartIndex((prev) => {
+      const newIndex = prev + 1;
+      if (newIndex + visibleCount > newsItems.length) {
+        return 0;
+      }
+      return newIndex;
+    });
   };
 
   // Get visible news items
@@ -1406,12 +1467,7 @@ const NewsSlider = ({ newsItems }) => {
       {/* Left Arrow */}
       <button
         onClick={prevSlide}
-        disabled={!canGoPrev}
-        className={`absolute left-0 md:left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-          canGoPrev
-            ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-lg'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-        }`}
+        className="absolute left-0 md:left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 bg-primary-600 text-white hover:bg-primary-700 shadow-lg"
         aria-label="Previous news"
       >
         <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
@@ -1463,12 +1519,7 @@ const NewsSlider = ({ newsItems }) => {
       {/* Right Arrow */}
       <button
         onClick={nextSlide}
-        disabled={!canGoNext}
-        className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-          canGoNext
-            ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-lg'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-        }`}
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 bg-primary-600 text-white hover:bg-primary-700 shadow-lg"
         aria-label="Next news"
       >
         <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />

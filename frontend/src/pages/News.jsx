@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { FiCalendar, FiUser, FiArrowRight, FiChevronLeft, FiChevronRight, FiAward, FiBriefcase, FiMapPin, FiClock } from 'react-icons/fi';
+import { FiCalendar, FiUser, FiArrowRight, FiChevronLeft, FiChevronRight, FiAward, FiBriefcase, FiMapPin, FiClock, FiVideo } from 'react-icons/fi';
 import api from '../utils/api';
 import { getBaseURL } from '../utils/url';
 
@@ -90,15 +90,31 @@ const News = () => {
 // Featured News Slider Component
 const FeaturedNewsSlider = ({ newsItems }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const videoRefs = useRef({});
 
-  // Auto-rotate slides every 5 seconds
+  // Auto-rotate: 5s for images, 30s for videos
   useEffect(() => {
     if (newsItems.length <= 1) return;
-    const timer = setInterval(() => {
+    const currentNews = newsItems[currentSlide];
+    const duration = currentNews?.videoUrl ? 10000 : 5000;
+    const timer = setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % newsItems.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [newsItems.length]);
+    }, duration);
+    return () => clearTimeout(timer);
+  }, [newsItems.length, currentSlide, newsItems]);
+
+  // Handle video play/pause when slide changes
+  useEffect(() => {
+    Object.entries(videoRefs.current).forEach(([idx, video]) => {
+      if (!video) return;
+      if (parseInt(idx) === currentSlide) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }, [currentSlide]);
 
   const goToSlide = (index) => {
     setCurrentSlide(index);
@@ -124,8 +140,19 @@ const FeaturedNewsSlider = ({ newsItems }) => {
             index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
           }`}
         >
-          {/* Background Image */}
-          {news.imageUrl ? (
+          {/* Background: Video or Image */}
+          {news.videoUrl ? (
+            <video
+              ref={(el) => { videoRefs.current[index] = el; }}
+              src={getImageUrl(news.videoUrl)}
+              className="absolute inset-0 w-full h-full object-cover"
+              autoPlay={index === 0}
+              muted
+              loop
+              playsInline
+              preload="auto"
+            />
+          ) : news.imageUrl ? (
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${getImageUrl(news.imageUrl)})` }}
@@ -225,15 +252,24 @@ const NewsCardSlider = ({ newsItems, formatDate }) => {
     }
   }, [visibleCount, newsItems.length, startIndex]);
 
-  const canGoPrev = startIndex > 0;
-  const canGoNext = startIndex + visibleCount < newsItems.length;
-
   const prevSlide = () => {
-    if (canGoPrev) setStartIndex((prev) => prev - 1);
+    setStartIndex((prev) => {
+      const newIndex = prev - 1;
+      if (newIndex < 0) {
+        return Math.max(0, newsItems.length - visibleCount);
+      }
+      return newIndex;
+    });
   };
 
   const nextSlide = () => {
-    if (canGoNext) setStartIndex((prev) => prev + 1);
+    setStartIndex((prev) => {
+      const newIndex = prev + 1;
+      if (newIndex + visibleCount > newsItems.length) {
+        return 0;
+      }
+      return newIndex;
+    });
   };
 
   const visibleNews = newsItems.slice(startIndex, startIndex + visibleCount);
@@ -243,12 +279,7 @@ const NewsCardSlider = ({ newsItems, formatDate }) => {
       {/* Left Arrow */}
       <button
         onClick={prevSlide}
-        disabled={!canGoPrev}
-        className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-          canGoPrev
-            ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-lg'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-        }`}
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 bg-primary-600 text-white hover:bg-primary-700 shadow-lg"
         aria-label="Previous news"
       >
         <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
@@ -263,16 +294,26 @@ const NewsCardSlider = ({ newsItems, formatDate }) => {
           >
             {/* Featured Image */}
             {article.imageUrl ? (
-              <div className="h-48 overflow-hidden">
+              <div className="h-48 overflow-hidden relative">
                 <img
                   src={getImageUrl(article.imageUrl)}
                   alt={article.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+                {article.videoUrl && (
+                  <span className="absolute top-2 right-2 flex items-center gap-1 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded-full">
+                    <FiVideo size={12} /> Video
+                  </span>
+                )}
               </div>
             ) : (
-              <div className="h-48 bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+              <div className="h-48 bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center relative">
                 <FiAward className="w-16 h-16 text-white/50" />
+                {article.videoUrl && (
+                  <span className="absolute top-2 right-2 flex items-center gap-1 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded-full">
+                    <FiVideo size={12} /> Video
+                  </span>
+                )}
               </div>
             )}
 
@@ -313,12 +354,7 @@ const NewsCardSlider = ({ newsItems, formatDate }) => {
       {/* Right Arrow */}
       <button
         onClick={nextSlide}
-        disabled={!canGoNext}
-        className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-          canGoNext
-            ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-lg'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-        }`}
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 bg-primary-600 text-white hover:bg-primary-700 shadow-lg"
         aria-label="Next news"
       >
         <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />

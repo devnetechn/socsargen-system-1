@@ -7,11 +7,17 @@ import { getBaseURL } from '../utils/url';
 
 const API_URL = getBaseURL();
 
-// Helper to get full image URL
+// Helper to get full media URL
 const getImageUrl = (imageUrl) => {
   if (!imageUrl) return null;
   if (imageUrl.startsWith('http')) return imageUrl;
   return `${API_URL}${imageUrl}`;
+};
+
+const getVideoUrl = (videoUrl) => {
+  if (!videoUrl) return null;
+  if (videoUrl.startsWith('http')) return videoUrl;
+  return `${API_URL}${videoUrl}`;
 };
 
 const NewsDetail = () => {
@@ -142,6 +148,21 @@ const NewsDetail = () => {
                 alt={article.title}
                 className="w-full h-auto"
               />
+            </div>
+          )}
+
+          {/* Video Player */}
+          {article.videoUrl && (
+            <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
+              <video
+                src={getVideoUrl(article.videoUrl)}
+                controls
+                className="w-full"
+                preload="metadata"
+                aria-label={`Video for ${article.title}`}
+              >
+                Your browser does not support the video tag.
+              </video>
             </div>
           )}
 

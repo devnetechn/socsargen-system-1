@@ -96,12 +96,21 @@ CREATE TABLE IF NOT EXISTS news (
     content TEXT NOT NULL,
     excerpt TEXT,
     image_url VARCHAR(500),
+    video_url VARCHAR(500),
     author_id UUID REFERENCES users(id) ON DELETE SET NULL,
     is_published BOOLEAN DEFAULT false,
     published_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add video_url column if it doesn't exist (for existing databases)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'news' AND column_name = 'video_url') THEN
+        ALTER TABLE news ADD COLUMN video_url VARCHAR(500);
+    END IF;
+END $$;
 
 -- ===========================================
 -- SERVICES TABLE
