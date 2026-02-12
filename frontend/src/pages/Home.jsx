@@ -18,24 +18,19 @@ import {
   FiVolumeX,
   FiMaximize,
   FiChevronLeft,
-  FiChevronRight
+  FiChevronRight,
+  FiSearch,
+  FiBriefcase
 } from 'react-icons/fi';
 import api from '../utils/api';
 import { getBaseURL } from '../utils/url';
 import hmoPartnersImg from '../assets/hmo-partners.jpg';
 import hospitalAerialImg from '../assets/hospital-aerial.jpg';
-import doctor1Img from '../assets/doctor1.jpg';
-import doctor2Img from '../assets/doctor2.jpg';
-import doctor3Img from '../assets/doctor3.jpg';
-import doctor4Img from '../assets/doctor4.jpg';
-import doctor5Img from '../assets/doctor5.jpg';
-import doctor6Img from '../assets/doctor6.jpg';
 import hero1Img from '../assets/hero1.jpg';
 import hero3Img from '../assets/hero3.jpg';
 import hero4Img from '../assets/hero4.jpg';
 import hero5Img from '../assets/hero5.jpg';
 import hero6Img from '../assets/hero6.jpg';
-import schStoriesVideo from '../assets/video1.mp4';
 
 const Home = () => {
   // Hero slideshow state
@@ -131,6 +126,15 @@ const Home = () => {
     })
   });
 
+  // Fetch doctors from API
+  const { data: doctorsData, isLoading: doctorsLoading } = useQuery({
+    queryKey: ['doctors', 'home'],
+    queryFn: () => api.get('/doctors?limit=6').then(res => res.data).catch((error) => {
+      console.error('Failed to fetch doctors:', error);
+      return null;
+    })
+  });
+
   // Service icons mapping
   const getServiceIcon = (iconName) => {
     const icons = {
@@ -159,15 +163,12 @@ const Home = () => {
     'Referral'
   ];
 
-  // Featured doctors
-  const featuredDoctors = [
-    { id: 1, name: 'Dr. Maria Santos', specialty: 'Cardiologist', image: doctor1Img },
-    { id: 2, name: 'Dr. Jose Garcia', specialty: 'Internal Medicine', image: doctor2Img },
-    { id: 3, name: 'Dr. Ana Reyes', specialty: 'Pediatrician', image: doctor3Img },
-    { id: 4, name: 'Dr. Miguel Cruz', specialty: 'Surgeon', image: doctor4Img },
-    { id: 5, name: 'Dr. Rosa Dela Cruz', specialty: 'OB-GYN', image: doctor5Img },
-    { id: 6, name: 'Dr. Carlos Mendoza', specialty: 'Anesthesiologist', image: doctor6Img }
-  ];
+  // Get doctor photo URL
+  const getDoctorPhotoUrl = (photoUrl) => {
+    if (!photoUrl) return null;
+    if (photoUrl.startsWith('http')) return photoUrl;
+    return `${getBaseURL()}${photoUrl}`;
+  };
 
   // Health packages
   const healthPackages = [
@@ -205,6 +206,90 @@ const Home = () => {
       return null;
     })
   });
+
+  // Fetch active jobs from API
+  const { data: jobsData, isLoading: jobsLoading } = useQuery({
+    queryKey: ['jobs', 'home'],
+    queryFn: () => api.get('/jobs?limit=6').then(res => res.data).catch((error) => {
+      console.error('Failed to fetch jobs:', error);
+      return null;
+    })
+  });
+
+  // Fetch all published SCH stories from API
+  const { data: schStories } = useQuery({
+    queryKey: ['schStories', 'published'],
+    queryFn: () => api.get('/sch-stories/published').then(res => res.data).catch((error) => {
+      console.error('Failed to fetch SCH stories:', error);
+      return [];
+    })
+  });
+
+  // SCH Stories slider state
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  const currentStory = schStories?.[currentStoryIndex] || null;
+
+  const goToPrevStory = () => {
+    if (schStories?.length > 0) {
+      setCurrentStoryIndex((prev) => (prev - 1 + schStories.length) % schStories.length);
+    }
+  };
+
+  const goToNextStory = () => {
+    if (schStories?.length > 0) {
+      setCurrentStoryIndex((prev) => (prev + 1) % schStories.length);
+    }
+  };
+
+  // HMO Partners data and state
+  const [hmoSearchQuery, setHmoSearchQuery] = useState('');
+  const [hmoSelectedCategory, setHmoSelectedCategory] = useState('All');
+
+  const hmoCategories = ['All', 'HMO', 'Insurance', 'Government', 'Corporate'];
+
+  const hmoPartners = [
+    // HMO
+    { id: 1, name: 'Maxicare', category: 'HMO', color: 'bg-blue-500' },
+    { id: 2, name: 'Intellicare', category: 'HMO', color: 'bg-green-500' },
+    { id: 3, name: 'Medicard', category: 'HMO', color: 'bg-red-500' },
+    { id: 4, name: 'PhilCare', category: 'HMO', color: 'bg-purple-500' },
+    { id: 5, name: 'Cocolife Healthcare', category: 'HMO', color: 'bg-yellow-500' },
+    { id: 6, name: 'Caritas Health Shield', category: 'HMO', color: 'bg-teal-500' },
+    { id: 7, name: 'Asianlife', category: 'HMO', color: 'bg-indigo-500' },
+    { id: 8, name: 'Valucare', category: 'HMO', color: 'bg-orange-500' },
+    { id: 9, name: 'Eastwest Healthcare', category: 'HMO', color: 'bg-pink-500' },
+    { id: 10, name: 'Insular Health Care', category: 'HMO', color: 'bg-cyan-500' },
+    { id: 11, name: 'Medicare Plus', category: 'HMO', color: 'bg-lime-500' },
+    { id: 12, name: 'Pacific Cross', category: 'HMO', color: 'bg-rose-500' },
+    // Insurance
+    { id: 13, name: 'Sun Life', category: 'Insurance', color: 'bg-amber-500' },
+    { id: 14, name: 'Pru Life UK', category: 'Insurance', color: 'bg-red-600' },
+    { id: 15, name: 'AXA Philippines', category: 'Insurance', color: 'bg-blue-600' },
+    { id: 16, name: 'Manulife', category: 'Insurance', color: 'bg-green-600' },
+    { id: 17, name: 'BPI-Philam', category: 'Insurance', color: 'bg-red-500' },
+    { id: 18, name: 'Allianz PNB Life', category: 'Insurance', color: 'bg-blue-700' },
+    // Government
+    { id: 19, name: 'PhilHealth', category: 'Government', color: 'bg-green-700' },
+    { id: 20, name: 'GSIS', category: 'Government', color: 'bg-blue-800' },
+    { id: 21, name: 'SSS', category: 'Government', color: 'bg-sky-600' },
+    // Corporate
+    { id: 22, name: 'DSWD AICS', category: 'Corporate', color: 'bg-orange-600' },
+    { id: 23, name: 'PCSO', category: 'Corporate', color: 'bg-yellow-600' },
+    { id: 24, name: 'DOH Medical Assistance', category: 'Corporate', color: 'bg-emerald-600' },
+  ];
+
+  const filteredHmoPartners = hmoPartners.filter(partner => {
+    const matchesSearch = partner.name.toLowerCase().includes(hmoSearchQuery.toLowerCase());
+    const matchesCategory = hmoSelectedCategory === 'All' || partner.category === hmoSelectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Get video URL helper
+  const getVideoUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${getBaseURL()}${url}`;
+  };
 
   // Format date helper
   const formatNewsDate = (dateString) => {
@@ -479,24 +564,24 @@ const Home = () => {
       </section>
 
       {/* Section 5: Meet Our Doctors Section */}
-      <section className="py-16 bg-primary-700">
+      <section className="py-10 sm:py-16 bg-primary-700">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">
               Meet our Doctors
             </h2>
-            <p className="text-primary-100 text-lg max-w-2xl mx-auto">
+            <p className="text-primary-100 text-sm sm:text-lg max-w-2xl mx-auto">
               Meet the seasoned experts of Socsargen County Hospital.
             </p>
           </div>
 
-          {/* Doctor Categories */}
-          <div className="flex flex-wrap justify-center gap-3 mb-10">
+          {/* Doctor Categories - horizontal scroll on mobile */}
+          <div className="flex gap-2 sm:gap-3 mb-8 sm:mb-10 overflow-x-auto scrollbar-hide sm:flex-wrap sm:justify-center pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
             {doctorCategories.map((category, index) => (
               <button
                 key={index}
                 type="button"
-                className="bg-white/10 border-2 border-white/30 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-white hover:text-primary-700 hover:border-white transition-all duration-300 cursor-pointer"
+                className="bg-white/10 border-2 border-white/30 text-white px-4 sm:px-5 py-2 rounded-full text-xs sm:text-sm font-medium hover:bg-white hover:text-primary-700 hover:border-white transition-all duration-300 cursor-pointer whitespace-nowrap flex-shrink-0"
               >
                 {category}
               </button>
@@ -504,39 +589,61 @@ const Home = () => {
           </div>
 
           {/* Doctor Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl mx-auto mb-10">
-            {featuredDoctors.map((doctor) => (
-              <div
-                key={doctor.id}
-                className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group"
-              >
-                <div className="aspect-square overflow-hidden">
-                  <img
-                    src={doctor.image}
-                    alt={doctor.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    style={{ objectPosition: 'center 20%' }}
-                  />
+          {doctorsLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 max-w-6xl mx-auto mb-8 sm:mb-10">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-white/20 rounded-xl h-48 sm:h-64 animate-pulse"></div>
+              ))}
+            </div>
+          ) : (doctorsData?.data || doctorsData || []).length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 max-w-6xl mx-auto mb-8 sm:mb-10">
+              {(doctorsData?.data || doctorsData || []).slice(0, 6).map((doctor) => (
+                <div
+                  key={doctor.id}
+                  className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group"
+                >
+                  <div className="aspect-square overflow-hidden bg-gray-100">
+                    {doctor.photoUrl || doctor.photo_url ? (
+                      <img
+                        src={getDoctorPhotoUrl(doctor.photoUrl || doctor.photo_url)}
+                        alt={doctor.name || `Dr. ${doctor.firstName} ${doctor.lastName}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        style={{ objectPosition: 'center 20%' }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-100 to-primary-200">
+                        <FiUser className="w-10 h-10 sm:w-16 sm:h-16 text-primary-400" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-2.5 sm:p-4 text-center">
+                    <h3 className="font-semibold text-gray-800 text-xs sm:text-sm mb-0.5 sm:mb-1 leading-tight line-clamp-2">
+                      {doctor.name || `Dr. ${doctor.firstName || doctor.first_name} ${doctor.lastName || doctor.last_name}`}
+                    </h3>
+                    <p className="text-primary-600 text-[10px] sm:text-xs font-medium line-clamp-1">
+                      {doctor.specialization || doctor.specialty}
+                    </p>
+                  </div>
                 </div>
-                <div className="p-4 text-center">
-                  <h3 className="font-semibold text-gray-800 text-sm mb-1">
-                    {doctor.name}
-                  </h3>
-                  <p className="text-primary-600 text-xs font-medium">
-                    {doctor.specialty}
-                  </p>
-                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 sm:py-12 mb-8 sm:mb-10">
+              <div className="bg-white/20 rounded-full w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-4">
+                <FiUser className="text-2xl sm:text-3xl text-white/70" />
               </div>
-            ))}
-          </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">No Doctors Yet</h3>
+              <p className="text-primary-200 text-sm">Our medical team will be added soon.</p>
+            </div>
+          )}
 
           <div className="text-center">
             <Link
               to="/doctors"
-              className="inline-flex items-center gap-2 bg-white text-primary-700 hover:bg-primary-50 font-semibold px-8 py-3 rounded-lg text-lg transition-all duration-300"
+              className="inline-flex items-center gap-2 bg-white text-primary-700 hover:bg-primary-50 font-semibold px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg text-sm sm:text-lg transition-all duration-300"
             >
               View All Doctors
-              <FiArrowRight className="w-5 h-5" />
+              <FiArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
           </div>
         </div>
@@ -639,54 +746,77 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-5xl mx-auto relative">
+            {/* Previous Button */}
+            {schStories?.length > 1 && (
+              <button
+                onClick={goToPrevStory}
+                className="absolute left-0 md:-left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white hover:bg-primary-50 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 border border-gray-200"
+                aria-label="Previous story"
+              >
+                <FiChevronLeft className="w-6 h-6 text-primary-600" />
+              </button>
+            )}
+
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="grid md:grid-cols-2">
                 {/* LEFT: Video */}
                 <div className="relative aspect-video md:aspect-auto md:h-full bg-black">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-full object-cover"
-                  >
-                    <source src={schStoriesVideo} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
+                  {currentStory?.videoUrl ? (
+                    <video
+                      ref={videoRef}
+                      key={currentStory.id}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="w-full h-full object-cover"
+                    >
+                      <source src={getVideoUrl(currentStory.videoUrl)} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-600 to-primary-800">
+                      <div className="text-center text-white">
+                        <FiUser className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                        <p className="text-sm opacity-75">No video available</p>
+                      </div>
+                    </div>
+                  )}
                   {/* Video controls */}
-                  <div className="absolute bottom-4 left-4 flex gap-2">
-                    <button
-                      onClick={toggleVideoMute}
-                      className="w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300"
-                      aria-label={isVideoMuted ? 'Unmute video' : 'Mute video'}
-                    >
-                      {isVideoMuted ? (
-                        <FiVolumeX className="w-5 h-5 text-gray-700" />
-                      ) : (
-                        <FiVolume2 className="w-5 h-5 text-primary-600" />
-                      )}
-                    </button>
-                    <button
-                      onClick={toggleFullscreen}
-                      className="w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300"
-                      aria-label="Fullscreen"
-                    >
-                      <FiMaximize className="w-5 h-5 text-gray-700 hover:text-primary-600" />
-                    </button>
-                  </div>
+                  {currentStory?.videoUrl && (
+                    <div className="absolute bottom-4 left-4 flex gap-2">
+                      <button
+                        onClick={toggleVideoMute}
+                        className="w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300"
+                        aria-label={isVideoMuted ? 'Unmute video' : 'Mute video'}
+                      >
+                        {isVideoMuted ? (
+                          <FiVolumeX className="w-5 h-5 text-gray-700" />
+                        ) : (
+                          <FiVolume2 className="w-5 h-5 text-primary-600" />
+                        )}
+                      </button>
+                      <button
+                        onClick={toggleFullscreen}
+                        className="w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300"
+                        aria-label="Fullscreen"
+                      >
+                        <FiMaximize className="w-5 h-5 text-gray-700 hover:text-primary-600" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* RIGHT: Content */}
                 <div className="p-8 md:p-10 flex flex-col justify-center">
                   <span className="inline-block bg-primary-100 text-primary-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-6 w-fit">
-                    Patient Highlight
+                    {currentStory?.title || 'Patient Highlight'}
                   </span>
                   <blockquote className="text-xl md:text-2xl text-gray-700 italic mb-8 leading-relaxed relative">
                     <span className="absolute -top-4 -left-2 text-6xl text-primary-200 font-serif leading-none">"</span>
                     <span className="relative z-10">
-                      I am deeply Grateful to Socsargen County Hospital, it was here that I Truly Experienced genuine compassion and care.
+                      {currentStory?.quote || 'I am deeply Grateful to Socsargen County Hospital, it was here that I Truly Experienced genuine compassion and care.'}
                     </span>
                   </blockquote>
                   <div className="flex items-center gap-4 mb-6">
@@ -694,10 +824,32 @@ const Home = () => {
                       <FiUser className="w-7 h-7 text-primary-600" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-800 text-lg">KARELLE M. RABIA</p>
-                      <p className="text-gray-500 text-sm">Patient</p>
+                      <p className="font-semibold text-gray-800 text-lg">{currentStory?.patientName || 'KARELLE M. RABIA'}</p>
+                      <p className="text-gray-500 text-sm">Patient{currentStory?.year ? ` - ${currentStory.year}` : ''}</p>
                     </div>
                   </div>
+
+                  {/* Slide indicators */}
+                  {schStories?.length > 1 && (
+                    <div className="flex items-center gap-2 mb-6">
+                      {schStories.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentStoryIndex(index)}
+                          className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                            index === currentStoryIndex
+                              ? 'bg-primary-600 w-6'
+                              : 'bg-gray-300 hover:bg-gray-400'
+                          }`}
+                          aria-label={`Go to story ${index + 1}`}
+                        />
+                      ))}
+                      <span className="ml-2 text-sm text-gray-500">
+                        {currentStoryIndex + 1} / {schStories.length}
+                      </span>
+                    </div>
+                  )}
+
                   <Link
                     to="/contact"
                     className="inline-flex items-center gap-2 bg-primary-600 text-white hover:bg-primary-700 font-semibold px-6 py-3 rounded-lg transition-all duration-300 w-fit"
@@ -708,6 +860,17 @@ const Home = () => {
                 </div>
               </div>
             </div>
+
+            {/* Next Button */}
+            {schStories?.length > 1 && (
+              <button
+                onClick={goToNextStory}
+                className="absolute right-0 md:-right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white hover:bg-primary-50 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 border border-gray-200"
+                aria-label="Next story"
+              >
+                <FiChevronRight className="w-6 h-6 text-primary-600" />
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -724,23 +887,81 @@ const Home = () => {
             </p>
           </div>
 
-          {/* Partner logos */}
-          <div className="max-w-4xl mx-auto">
-            <img
-              src={hmoPartnersImg}
-              alt="Affiliated Health Maintenance Organization (HMO) Partners"
-              className="w-full h-auto rounded-xl shadow-lg"
-            />
+          {/* Search Bar */}
+          <div className="max-w-md mx-auto mb-8">
+            <div className="relative">
+              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search HMO or Insurance..."
+                value={hmoSearchQuery}
+                onChange={(e) => setHmoSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
+              />
+            </div>
           </div>
+
+          {/* Category Tabs */}
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
+            {hmoCategories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setHmoSelectedCategory(category)}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                  hmoSelectedCategory === category
+                    ? 'bg-primary-600 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
+          {/* Partners Grid */}
+          <div className="max-w-5xl mx-auto">
+            {filteredHmoPartners.length === 0 ? (
+              <div className="text-center py-12">
+                <FiSearch className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500">No partners found matching your search.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {filteredHmoPartners.map((partner) => (
+                  <div
+                    key={partner.id}
+                    className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-primary-300 transition-all duration-300 group"
+                  >
+                    <div className={`w-12 h-12 ${partner.color} rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform`}>
+                      <span className="text-white font-bold text-lg">
+                        {partner.name.charAt(0)}
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-medium text-gray-800 text-center line-clamp-2">
+                      {partner.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 text-center mt-1">
+                      {partner.category}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Partner Count */}
+          <p className="text-center text-gray-500 text-sm mt-8">
+            Showing {filteredHmoPartners.length} of {hmoPartners.length} partners
+          </p>
         </div>
       </section>
 
       {/* Facebook Section */}
       <section className="py-16 bg-gradient-to-br from-primary-600 to-primary-800">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center">
+          <div className="flex flex-col lg:flex-row items-center gap-8">
             {/* Left Content */}
-            <div className="text-center lg:text-left text-white lg:pr-8 mb-8 lg:mb-0">
+            <div className="text-center lg:text-left text-white lg:flex-1">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 Stay Connected with <br className="hidden md:block" />Socsargen County Hospital!
               </h2>
@@ -762,19 +983,37 @@ const Home = () => {
               </a>
             </div>
 
-            {/* Right Facebook Embed */}
-            <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
-              <iframe
-                src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FSocsargenCountyHospitalOfficial&tabs=timeline&width=550&height=480&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true"
-                width="1350"
-                height="500"
-                style={{ border: 'none', overflow: 'hidden' }}
-                scrolling="no"
-                frameBorder="0"
-                allowFullScreen={true}
-                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                title="Socsargen County Hospital Facebook Page"
-              ></iframe>
+            {/* Right Facebook Embed - Responsive */}
+            <div className="w-full lg:w-auto flex justify-center">
+              <div className="bg-white rounded-xl shadow-2xl overflow-hidden inline-block">
+                {/* Mobile: 320px width, Desktop: 400px width */}
+                <div className="block md:hidden">
+                  <iframe
+                    src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FSocsargenCountyHospitalOfficial&tabs=timeline&width=320&height=380&small_header=true&adapt_container_width=false&hide_cover=false&show_facepile=false"
+                    width="320"
+                    height="380"
+                    style={{ border: 'none', overflow: 'hidden', display: 'block' }}
+                    scrolling="no"
+                    frameBorder="0"
+                    allowFullScreen={true}
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                    title="Socsargen County Hospital Facebook Page"
+                  ></iframe>
+                </div>
+                <div className="hidden md:block">
+                  <iframe
+                    src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2FSocsargenCountyHospitalOfficial&tabs=timeline&width=400&height=450&small_header=false&adapt_container_width=false&hide_cover=false&show_facepile=true"
+                    width="400"
+                    height="450"
+                    style={{ border: 'none', overflow: 'hidden', display: 'block' }}
+                    scrolling="no"
+                    frameBorder="0"
+                    allowFullScreen={true}
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                    title="Socsargen County Hospital Facebook Page"
+                  ></iframe>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -832,7 +1071,76 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Section 11: Contact Preview Section */}
+      {/* Section 11: Careers/Hiring Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+              Join Our Team
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Be part of our mission to provide quality healthcare. Explore career opportunities at Socsargen County Hospital.
+            </p>
+          </div>
+
+          {jobsLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-gray-100 h-48 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          ) : (jobsData?.data || jobsData || []).length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {(jobsData?.data || jobsData || []).slice(0, 6).map((job) => (
+                <div
+                  key={job.id}
+                  className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-primary-300 transition-all duration-300 group"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-500 transition-colors">
+                      <FiBriefcase className="w-6 h-6 text-primary-600 group-hover:text-white transition-colors" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-800 mb-1 group-hover:text-primary-600 transition-colors line-clamp-1">
+                        {job.title}
+                      </h3>
+                      <p className="text-sm text-gray-500 mb-2">{job.department}</p>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="inline-block bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-full">
+                          {job.jobType || job.job_type || 'Full-time'}
+                        </span>
+                        <span className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
+                          {job.location || 'General Santos City'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                <FiBriefcase className="text-3xl text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Open Positions</h3>
+              <p className="text-gray-500">Check back later for career opportunities.</p>
+            </div>
+          )}
+
+          <div className="text-center mt-10">
+            <Link
+              to="/careers"
+              className="inline-flex items-center gap-2 bg-primary-600 text-white hover:bg-primary-700 font-semibold px-6 py-3 rounded-lg transition-all duration-300"
+            >
+              View All Job Openings
+              <FiArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 12: Contact Preview Section */}
       <section className="py-16 bg-gradient-to-br from-primary-600 to-primary-800 text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">

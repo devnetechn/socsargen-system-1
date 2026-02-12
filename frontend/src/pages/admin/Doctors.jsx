@@ -19,7 +19,7 @@ const AdminDoctors = () => {
   // Fetch all doctors (including unavailable ones for admin)
   const { data: doctors, isLoading } = useQuery({
     queryKey: ['adminDoctors'],
-    queryFn: () => api.get('/doctors').then(res => res.data)
+    queryFn: () => api.get('/doctors/admin/all').then(res => res.data)
   });
 
   // Create doctor mutation
@@ -145,7 +145,7 @@ const AdminDoctors = () => {
             )}
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {filteredDoctors?.map((doctor) => (
               <div key={doctor.id} className="card">
                 <div className="flex items-start justify-between mb-4">

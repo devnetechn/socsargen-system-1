@@ -18,9 +18,18 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR(20) DEFAULT 'patient' CHECK (role IN ('patient', 'doctor', 'admin', 'hr')),
     is_active BOOLEAN DEFAULT true,
     email_verified BOOLEAN DEFAULT false,
+    session_token TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add session_token column if it doesn't exist (for existing databases)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'session_token') THEN
+        ALTER TABLE users ADD COLUMN session_token TEXT;
+    END IF;
+END $$;
 
 -- ===========================================
 -- DOCTORS TABLE
@@ -207,3 +216,24 @@ CREATE INDEX IF NOT EXISTS idx_jobs_department ON jobs(department);
 CREATE INDEX IF NOT EXISTS idx_job_applications_job ON job_applications(job_id);
 CREATE INDEX IF NOT EXISTS idx_job_applications_user ON job_applications(user_id);
 CREATE INDEX IF NOT EXISTS idx_job_applications_status ON job_applications(status);
+
+-- ===========================================
+-- SCH STORIES TABLE (Patient Testimonials)
+-- ===========================================
+CREATE TABLE IF NOT EXISTS sch_stories (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(255) NOT NULL,
+    patient_name VARCHAR(255) NOT NULL,
+    quote TEXT,
+    video_url VARCHAR(500) NOT NULL,
+    thumbnail_url VARCHAR(500),
+    year INTEGER NOT NULL,
+    is_active BOOLEAN DEFAULT false,
+    uploaded_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Only one story can be active at a time
+CREATE UNIQUE INDEX IF NOT EXISTS idx_sch_stories_active ON sch_stories(is_active) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_sch_stories_year ON sch_stories(year);

@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 });
 
 // File filter - only allow images
-const fileFilter = (req, file, cb) => {
+const imageFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
@@ -34,12 +34,31 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer upload
+// File filter - allow videos
+const videoFilter = (req, file, cb) => {
+  const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only video files are allowed (MP4, WebM, OGG)'), false);
+  }
+};
+
+// Configure multer upload for images
 const upload = multer({
   storage,
-  fileFilter,
+  fileFilter: imageFilter,
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
+
+// Configure multer upload for videos (larger file size)
+const videoUpload = multer({
+  storage,
+  fileFilter: videoFilter,
+  limits: {
+    fileSize: 100 * 1024 * 1024 // 100MB limit for videos
   }
 });
 
@@ -64,11 +83,32 @@ router.post('/image', authenticate, authorize('admin'), upload.single('image'), 
   }
 });
 
+// Upload single video (admin only)
+router.post('/video', authenticate, authorize('admin'), videoUpload.single('video'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No video file provided.' });
+    }
+
+    // Return the URL to access the video
+    const videoUrl = `/uploads/${req.file.filename}`;
+
+    res.json({
+      message: 'Video uploaded successfully!',
+      videoUrl,
+      filename: req.file.filename
+    });
+  } catch (error) {
+    console.error('Video upload error:', error);
+    res.status(500).json({ error: 'Failed to upload video.' });
+  }
+});
+
 // Error handling for multer
 router.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'File too large. Maximum size is 5MB.' });
+      return res.status(400).json({ error: 'File too large. Maximum size is 100MB for videos, 5MB for images.' });
     }
     return res.status(400).json({ error: error.message });
   }

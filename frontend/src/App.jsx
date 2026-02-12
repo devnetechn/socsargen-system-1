@@ -44,6 +44,7 @@ import AdminAnalytics from './pages/admin/Analytics';
 import AdminChat from './pages/admin/Chat';
 import AdminHRManagement from './pages/admin/HRManagement';
 import AdminServices from './pages/admin/Services';
+import AdminSchStories from './pages/admin/SchStories';
 
 // HR Pages
 import HRDashboard from './pages/hr/Dashboard';
@@ -201,6 +202,14 @@ function App() {
             element={
               <ProtectedRoute roles={['admin']}>
                 <AdminServices />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/sch-stories"
+            element={
+              <ProtectedRoute roles={['admin']}>
+                <AdminSchStories />
               </ProtectedRoute>
             }
           />

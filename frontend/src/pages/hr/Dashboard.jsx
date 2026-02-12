@@ -80,29 +80,29 @@ const HRDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-8">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">HR Dashboard</h1>
-          <p className="text-gray-600 mt-1">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">HR Dashboard</h1>
+          <p className="text-gray-600 mt-1 text-sm">
             Welcome back, {user?.firstName}! Manage job postings and applications.
           </p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           {statCards.map((stat, index) => (
-            <div key={index} className="bg-white rounded-xl shadow-sm p-6">
+            <div key={index} className="bg-white rounded-xl shadow-sm p-3 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">{stat.title}</p>
-                  <p className="text-3xl font-bold text-gray-800 mt-1">
+                  <p className="text-xs sm:text-sm text-gray-500">{stat.title}</p>
+                  <p className="text-xl sm:text-3xl font-bold text-gray-800 mt-1">
                     {statsLoading ? '...' : stat.value}
                   </p>
                 </div>
-                <div className={`w-12 h-12 ${stat.color} rounded-lg flex items-center justify-center`}>
-                  <stat.icon className="w-6 h-6 text-white" />
+                <div className={`w-9 h-9 sm:w-12 sm:h-12 ${stat.color} rounded-lg flex items-center justify-center`}>
+                  <stat.icon className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
               </div>
             </div>
@@ -110,99 +110,99 @@ const HRDashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 mb-6 sm:mb-8">
           <Link
             to="/hr/jobs"
-            className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow flex items-center gap-4"
+            className="bg-white rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow flex items-center gap-3 sm:gap-4"
           >
-            <div className="w-14 h-14 bg-primary-100 rounded-lg flex items-center justify-center">
-              <FiBriefcase className="w-7 h-7 text-primary-600" />
+            <div className="w-11 h-11 sm:w-14 sm:h-14 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <FiBriefcase className="w-5 h-5 sm:w-7 sm:h-7 text-primary-600" />
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800">Manage Job Postings</h3>
-              <p className="text-gray-500 text-sm">Create, edit, and manage job listings</p>
+            <div className="min-w-0">
+              <h3 className="text-sm sm:text-lg font-semibold text-gray-800">Manage Job Postings</h3>
+              <p className="text-gray-500 text-xs sm:text-sm">Create, edit, and manage job listings</p>
             </div>
           </Link>
 
           <Link
             to="/hr/applications"
-            className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow flex items-center gap-4"
+            className="bg-white rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow flex items-center gap-3 sm:gap-4"
           >
-            <div className="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center">
-              <FiUsers className="w-7 h-7 text-green-600" />
+            <div className="w-11 h-11 sm:w-14 sm:h-14 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <FiUsers className="w-5 h-5 sm:w-7 sm:h-7 text-green-600" />
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800">Review Applications</h3>
-              <p className="text-gray-500 text-sm">View and process job applications</p>
+            <div className="min-w-0">
+              <h3 className="text-sm sm:text-lg font-semibold text-gray-800">Review Applications</h3>
+              <p className="text-gray-500 text-xs sm:text-sm">View and process job applications</p>
             </div>
           </Link>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6 mb-3 sm:mb-6">
           {/* Recent Applications */}
           <div className="bg-white rounded-xl shadow-sm">
-            <div className="p-6 border-b border-gray-100">
+            <div className="p-4 sm:p-6 border-b border-gray-100">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-800">Recent Applications</h2>
-                <Link to="/hr/applications" className="text-primary-600 text-sm hover:underline">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-800">Recent Applications</h2>
+                <Link to="/hr/applications" className="text-primary-600 text-xs sm:text-sm hover:underline">
                   View All
                 </Link>
               </div>
             </div>
-            <div className="p-6">
+            <div className="p-3 sm:p-6">
               {appsLoading ? (
-                <p className="text-gray-500 text-center py-4">Loading...</p>
+                <p className="text-gray-500 text-center py-4 text-sm">Loading...</p>
               ) : applications?.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-2 sm:space-y-4">
                   {applications.slice(0, 5).map((app) => (
-                    <div key={app.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-gray-800">
+                    <div key={app.id} className="flex items-center justify-between p-2.5 sm:p-3 bg-gray-50 rounded-lg gap-2">
+                      <div className="min-w-0">
+                        <p className="font-medium text-gray-800 text-sm truncate">
                           {app.applicant?.firstName} {app.applicant?.lastName}
                         </p>
-                        <p className="text-sm text-gray-500">{app.jobTitle}</p>
+                        <p className="text-xs text-gray-500 truncate">{app.jobTitle}</p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(app.status)}`}>
+                      <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getStatusBadge(app.status)}`}>
                         {app.status}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-4">No applications yet</p>
+                <p className="text-gray-500 text-center py-4 text-sm">No applications yet</p>
               )}
             </div>
           </div>
 
           {/* Active Job Postings */}
           <div className="bg-white rounded-xl shadow-sm">
-            <div className="p-6 border-b border-gray-100">
+            <div className="p-4 sm:p-6 border-b border-gray-100">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-800">Active Job Postings</h2>
-                <Link to="/hr/jobs" className="text-primary-600 text-sm hover:underline">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-800">Active Job Postings</h2>
+                <Link to="/hr/jobs" className="text-primary-600 text-xs sm:text-sm hover:underline">
                   Manage Jobs
                 </Link>
               </div>
             </div>
-            <div className="p-6">
+            <div className="p-3 sm:p-6">
               {jobsLoading ? (
-                <p className="text-gray-500 text-center py-4">Loading...</p>
+                <p className="text-gray-500 text-center py-4 text-sm">Loading...</p>
               ) : jobs?.filter(j => j.isActive)?.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-2 sm:space-y-4">
                   {jobs.filter(j => j.isActive).slice(0, 5).map((job) => (
-                    <div key={job.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-gray-800">{job.title}</p>
-                        <p className="text-sm text-gray-500">{job.department}</p>
+                    <div key={job.id} className="flex items-center justify-between p-2.5 sm:p-3 bg-gray-50 rounded-lg gap-2">
+                      <div className="min-w-0">
+                        <p className="font-medium text-gray-800 text-sm truncate">{job.title}</p>
+                        <p className="text-xs text-gray-500 truncate">{job.department}</p>
                       </div>
-                      <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                      <span className="px-2 sm:px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium flex-shrink-0">
                         Active
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-4">No active job postings</p>
+                <p className="text-gray-500 text-center py-4 text-sm">No active job postings</p>
               )}
             </div>
           </div>
@@ -210,59 +210,83 @@ const HRDashboard = () => {
 
         {/* Rejected Applications Section */}
         <div className="bg-white rounded-xl shadow-sm">
-          <div className="p-6 border-b border-gray-100">
+          <div className="p-4 sm:p-6 border-b border-gray-100">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                  <FiXCircle className="w-5 h-5 text-red-600" />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                  <FiXCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
                 </div>
-                <h2 className="text-lg font-semibold text-gray-800">Rejected Applications</h2>
+                <h2 className="text-base sm:text-lg font-semibold text-gray-800">Rejected Applications</h2>
               </div>
-              <Link to="/hr/applications?status=rejected" className="text-primary-600 text-sm hover:underline">
-                View All Rejected
+              <Link to="/hr/applications?status=rejected" className="text-primary-600 text-xs sm:text-sm hover:underline">
+                View All
               </Link>
             </div>
           </div>
-          <div className="p-6">
+          <div className="p-3 sm:p-6">
             {rejectedLoading ? (
-              <p className="text-gray-500 text-center py-4">Loading...</p>
+              <p className="text-gray-500 text-center py-4 text-sm">Loading...</p>
             ) : rejectedApps?.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left text-sm text-gray-500 border-b">
-                      <th className="pb-3 font-medium">Applicant</th>
-                      <th className="pb-3 font-medium">Position</th>
-                      <th className="pb-3 font-medium">Email</th>
-                      <th className="pb-3 font-medium">Date Applied</th>
-                      <th className="pb-3 font-medium">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {rejectedApps.slice(0, 10).map((app) => (
-                      <tr key={app.id} className="text-sm">
-                        <td className="py-3">
-                          <p className="font-medium text-gray-800">
-                            {app.applicant?.firstName} {app.applicant?.lastName}
-                          </p>
-                        </td>
-                        <td className="py-3 text-gray-600">{app.jobTitle}</td>
-                        <td className="py-3 text-gray-600">{app.applicant?.email}</td>
-                        <td className="py-3 text-gray-500">
-                          {new Date(app.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="py-3">
-                          <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
-                            Rejected
-                          </span>
-                        </td>
+              <>
+                {/* Desktop Table */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="text-left text-sm text-gray-500 border-b">
+                        <th className="pb-3 font-medium">Applicant</th>
+                        <th className="pb-3 font-medium">Position</th>
+                        <th className="pb-3 font-medium">Email</th>
+                        <th className="pb-3 font-medium">Date Applied</th>
+                        <th className="pb-3 font-medium">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {rejectedApps.slice(0, 10).map((app) => (
+                        <tr key={app.id} className="text-sm">
+                          <td className="py-3">
+                            <p className="font-medium text-gray-800">
+                              {app.applicant?.firstName} {app.applicant?.lastName}
+                            </p>
+                          </td>
+                          <td className="py-3 text-gray-600">{app.jobTitle}</td>
+                          <td className="py-3 text-gray-600">{app.applicant?.email}</td>
+                          <td className="py-3 text-gray-500">
+                            {new Date(app.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="py-3">
+                            <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                              Rejected
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Cards */}
+                <div className="md:hidden space-y-2">
+                  {rejectedApps.slice(0, 10).map((app) => (
+                    <div key={app.id} className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <p className="font-medium text-gray-800 text-sm truncate">
+                          {app.applicant?.firstName} {app.applicant?.lastName}
+                        </p>
+                        <span className="px-2 py-0.5 bg-red-100 text-red-800 rounded-full text-xs font-medium flex-shrink-0">
+                          Rejected
+                        </span>
+                      </div>
+                      <p className="text-xs text-primary-600 font-medium truncate">{app.jobTitle}</p>
+                      <p className="text-xs text-gray-500 mt-0.5 truncate">{app.applicant?.email}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {new Date(app.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : (
-              <p className="text-gray-500 text-center py-4">No rejected applications</p>
+              <p className="text-gray-500 text-center py-4 text-sm">No rejected applications</p>
             )}
           </div>
         </div>

@@ -18,6 +18,7 @@ const uploadRoutes = require('./routes/upload.routes');
 const jobsRoutes = require('./routes/jobs.routes');
 const applicationsRoutes = require('./routes/applications.routes');
 const usersRoutes = require('./routes/users.routes');
+const schStoriesRoutes = require('./routes/schStories.routes');
 
 // Import services
 const { handleChatMessage, saveMessage } = require('./services/chat.service');
@@ -45,7 +46,18 @@ const io = new Server(server, {
 
 // Security headers
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://connect.facebook.net"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "blob:", "https:", "http:"],
+      frameSrc: ["'self'", "https://www.facebook.com", "https://web.facebook.com", "https://www.google.com"],
+      connectSrc: ["'self'", "ws:", "wss:", "http:", "https:"],
+    }
+  }
 }));
 
 // CORS - Allow LAN access for development
@@ -94,6 +106,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/jobs', jobsRoutes);
 app.use('/api/applications', applicationsRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/sch-stories', schStoriesRoutes);
 
 // ===========================================
 // SOCKET.IO CHAT HANDLERS
@@ -365,6 +378,20 @@ io.on('connection', (socket) => {
 // ===========================================
 // ERROR HANDLING
 // ===========================================
+
+// Serve frontend build files (for production/ngrok)
+const frontendBuildPath = path.join(__dirname, '../../frontend/dist');
+app.use(express.static(frontendBuildPath));
+
+// SPA fallback - serve index.html for non-API routes
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) {
+    return next();
+  }
+  res.sendFile(path.join(frontendBuildPath, 'index.html'), (err) => {
+    if (err) next();
+  });
+});
 
 // 404 handler
 app.use((req, res) => {

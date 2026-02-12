@@ -299,7 +299,7 @@ const Navbar = () => {
                         <Link
                           key={`service-${item.label}`}
                           to={item.href}
-                          className="block py-2 px-2 text-sm text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded transition"
+                          className="block py-3 px-3 text-sm text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded transition"
                           onClick={() => setIsOpen(false)}
                         >
                           {item.label}
@@ -333,7 +333,7 @@ const Navbar = () => {
                         <Link
                           key={`doctor-${item.label}`}
                           to={item.href}
-                          className="block py-2 px-2 text-sm text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded transition"
+                          className="block py-3 px-3 text-sm text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded transition"
                           onClick={() => setIsOpen(false)}
                         >
                           {item.label}
@@ -367,7 +367,7 @@ const Navbar = () => {
                         <Link
                           key={`about-${item.label}`}
                           to={item.href}
-                          className="block py-2 px-2 text-sm text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded transition"
+                          className="block py-3 px-3 text-sm text-gray-600 hover:text-primary-600 hover:bg-gray-50 rounded transition"
                           onClick={() => setIsOpen(false)}
                         >
                           {item.label}

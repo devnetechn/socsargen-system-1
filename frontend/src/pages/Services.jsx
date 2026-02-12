@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { FiSearch, FiChevronLeft, FiChevronRight, FiPhone, FiActivity } from 'react-icons/fi';
+import { FiSearch, FiChevronLeft, FiChevronRight, FiPhone, FiActivity, FiX } from 'react-icons/fi';
 import api from '../utils/api';
 import { getBaseURL } from '../utils/url';
 
@@ -12,7 +12,6 @@ const getDefaultServiceImage = (service) => {
   const name = (service.name || '').toLowerCase();
   const category = (service.category || '').toLowerCase();
 
-  // Return placeholder gradient colors based on service type
   if (name.includes('cardiac') || name.includes('heart') || name.includes('cardio') || category.includes('cardiac')) {
     return 'from-red-500 to-red-600';
   }
@@ -107,107 +106,129 @@ const Services = () => {
   };
 
   return (
-    <div className="py-12 bg-gray-50 min-h-screen">
-      <div className="container mx-auto px-4">
+    <div className="py-6 sm:py-12 bg-gray-50 min-h-screen">
+      <div className="container mx-auto px-3 sm:px-4">
         {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold mb-4 text-green-800">Our Services</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+        <div className="text-center mb-6 sm:mb-10">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-4 text-green-800">Our Services</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-lg">
             Socsargen County Hospital offers comprehensive healthcare services with state-of-the-art facilities and expert medical professionals.
           </p>
         </div>
 
         {/* Search Bar */}
-        <div className="mb-6 max-w-2xl mx-auto">
+        <div className="mb-5 sm:mb-6 max-w-2xl mx-auto">
           <div className="relative">
-            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
+            <FiSearch className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg sm:text-xl" />
             <input
               type="text"
               placeholder="Search services..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border-2 border-green-200 rounded-full focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all text-gray-700"
+              className="w-full pl-10 sm:pl-12 pr-10 py-2.5 sm:py-3 border-2 border-green-200 rounded-full focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all text-sm sm:text-base text-gray-700"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+              >
+                <FiX />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Category Filter Tabs */}
+        {/* Category Filter - Dropdown on mobile, tabs on desktop */}
         {categories && categories.length > 0 && (
-          <div className="mb-8 relative">
-            <div className="flex items-center">
-              {/* Left Arrow */}
-              {showLeftArrow && (
-                <button
-                  onClick={() => scrollTabs('left')}
-                  className="absolute left-0 z-10 bg-white shadow-md rounded-full p-2 text-green-600 hover:bg-green-50 transition-colors"
-                  aria-label="Scroll left"
-                >
-                  <FiChevronLeft className="text-xl" />
-                </button>
-              )}
-
-              {/* Scrollable Tabs Container */}
-              <div
-                ref={tabsContainerRef}
-                onScroll={checkScrollPosition}
-                className="flex gap-2 overflow-x-auto scrollbar-hide py-2 px-8 mx-auto"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          <div className="mb-6 sm:mb-8">
+            {/* Mobile: Dropdown */}
+            <div className="sm:hidden">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full py-2.5 px-3 border-2 border-green-200 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all text-sm text-gray-700 bg-white"
               >
-                {/* All Categories Tab */}
-                <button
-                  onClick={() => setSelectedCategory('')}
-                  className={`px-5 py-2.5 rounded-full whitespace-nowrap font-medium transition-all text-sm ${
-                    selectedCategory === ''
-                      ? 'bg-green-600 text-white shadow-lg shadow-green-200'
-                      : 'bg-white text-green-700 border-2 border-green-200 hover:border-green-400 hover:bg-green-50'
-                  }`}
-                >
-                  All Services
-                </button>
+                <option value="">All Services ({services?.length || 0})</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>
+                    {cat} ({services?.filter(s => s.category === cat).length || 0})
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                {/* Category Tabs */}
-                {categories?.map((cat) => (
+            {/* Desktop: Scrollable tabs */}
+            <div className="hidden sm:block relative">
+              <div className="flex items-center">
+                {showLeftArrow && (
                   <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
+                    onClick={() => scrollTabs('left')}
+                    className="absolute left-0 z-10 bg-white shadow-md rounded-full p-2 text-green-600 hover:bg-green-50 transition-colors"
+                    aria-label="Scroll left"
+                  >
+                    <FiChevronLeft className="text-xl" />
+                  </button>
+                )}
+
+                <div
+                  ref={tabsContainerRef}
+                  onScroll={checkScrollPosition}
+                  className="flex gap-2 overflow-x-auto scrollbar-hide py-2 px-8 mx-auto"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  <button
+                    onClick={() => setSelectedCategory('')}
                     className={`px-5 py-2.5 rounded-full whitespace-nowrap font-medium transition-all text-sm ${
-                      selectedCategory === cat
+                      selectedCategory === ''
                         ? 'bg-green-600 text-white shadow-lg shadow-green-200'
                         : 'bg-white text-green-700 border-2 border-green-200 hover:border-green-400 hover:bg-green-50'
                     }`}
                   >
-                    {cat}
+                    All Services
                   </button>
-                ))}
-              </div>
 
-              {/* Right Arrow */}
-              {showRightArrow && (
-                <button
-                  onClick={() => scrollTabs('right')}
-                  className="absolute right-0 z-10 bg-white shadow-md rounded-full p-2 text-green-600 hover:bg-green-50 transition-colors"
-                  aria-label="Scroll right"
-                >
-                  <FiChevronRight className="text-xl" />
-                </button>
-              )}
+                  {categories?.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`px-5 py-2.5 rounded-full whitespace-nowrap font-medium transition-all text-sm ${
+                        selectedCategory === cat
+                          ? 'bg-green-600 text-white shadow-lg shadow-green-200'
+                          : 'bg-white text-green-700 border-2 border-green-200 hover:border-green-400 hover:bg-green-50'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+
+                {showRightArrow && (
+                  <button
+                    onClick={() => scrollTabs('right')}
+                    className="absolute right-0 z-10 bg-white shadow-md rounded-full p-2 text-green-600 hover:bg-green-50 transition-colors"
+                    aria-label="Scroll right"
+                  >
+                    <FiChevronRight className="text-xl" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}
 
         {/* Loading State */}
         {isLoading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600"></div>
+          <div className="flex justify-center py-10 sm:py-12">
+            <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-green-600"></div>
           </div>
         ) : filteredServices?.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="bg-white rounded-xl p-8 shadow-sm max-w-md mx-auto">
-              <FiActivity className="text-5xl text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">No services found matching your criteria.</p>
+          <div className="text-center py-10 sm:py-12">
+            <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm max-w-md mx-auto">
+              <FiActivity className="text-4xl sm:text-5xl text-gray-300 mx-auto mb-3 sm:mb-4" />
+              <p className="text-gray-500 text-sm sm:text-lg">No services found matching your criteria.</p>
               <button
                 onClick={() => { setSearchTerm(''); setSelectedCategory(''); }}
-                className="mt-4 text-green-600 hover:text-green-700 font-medium"
+                className="mt-3 sm:mt-4 text-green-600 hover:text-green-700 font-medium text-sm sm:text-base"
               >
                 Clear filters
               </button>
@@ -215,23 +236,20 @@ const Services = () => {
           </div>
         ) : (
           /* Services Display */
-          <div className="space-y-10">
+          <div className="space-y-8 sm:space-y-10">
             {selectedCategory ? (
               /* Single Category View */
               <div>
-                <h2 className="text-2xl font-bold text-green-800 mb-6 flex items-center gap-3">
-                  <span className="w-2 h-8 bg-green-500 rounded-full"></span>
+                <h2 className="text-lg sm:text-2xl font-bold text-green-800 mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+                  <span className="w-1.5 sm:w-2 h-6 sm:h-8 bg-green-500 rounded-full"></span>
                   {selectedCategory}
-                  <span className="text-sm font-normal text-gray-500">
+                  <span className="text-xs sm:text-sm font-normal text-gray-500">
                     ({filteredServices?.length} service{filteredServices?.length !== 1 ? 's' : ''})
                   </span>
                 </h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                   {filteredServices?.map((service) => (
-                    <ServiceCard
-                      key={service.id}
-                      service={service}
-                    />
+                    <ServiceCard key={service.id} service={service} />
                   ))}
                 </div>
               </div>
@@ -239,19 +257,16 @@ const Services = () => {
               /* All Categories Grouped View */
               Object.entries(groupedServices || {}).map(([category, catServices]) => (
                 <div key={category}>
-                  <h2 className="text-2xl font-bold text-green-800 mb-6 flex items-center gap-3">
-                    <span className="w-2 h-8 bg-green-500 rounded-full"></span>
+                  <h2 className="text-lg sm:text-2xl font-bold text-green-800 mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+                    <span className="w-1.5 sm:w-2 h-6 sm:h-8 bg-green-500 rounded-full"></span>
                     {category}
-                    <span className="text-sm font-normal text-gray-500">
+                    <span className="text-xs sm:text-sm font-normal text-gray-500">
                       ({catServices.length} service{catServices.length !== 1 ? 's' : ''})
                     </span>
                   </h2>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
                     {catServices.map((service) => (
-                      <ServiceCard
-                        key={service.id}
-                        service={service}
-                      />
+                      <ServiceCard key={service.id} service={service} />
                     ))}
                   </div>
                 </div>
@@ -261,28 +276,27 @@ const Services = () => {
         )}
 
         {/* Contact CTA */}
-        <div className="mt-16 bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">Need More Information?</h2>
-          <p className="text-green-100 mb-6 max-w-xl mx-auto">
+        <div className="mt-10 sm:mt-16 bg-gradient-to-r from-green-600 to-green-700 rounded-xl sm:rounded-2xl p-5 sm:p-8 text-center text-white">
+          <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4">Need More Information?</h2>
+          <p className="text-green-100 mb-4 sm:mb-6 max-w-xl mx-auto text-sm sm:text-base">
             Contact us to learn more about our services or to schedule a consultation with our medical experts.
           </p>
-          <div className="flex justify-center gap-4 flex-wrap">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <a
               href="tel:553-8906"
-              className="inline-flex items-center gap-2 bg-white text-green-700 px-6 py-3 rounded-full font-semibold hover:bg-green-50 transition"
+              className="inline-flex items-center justify-center gap-2 bg-white text-green-700 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-semibold text-sm sm:text-base hover:bg-green-50 transition"
             >
               <FiPhone /> Call: 553-8906
             </a>
             <a
               href="/contact"
-              className="inline-flex items-center gap-2 border-2 border-white text-white px-6 py-3 rounded-full font-semibold hover:bg-white/10 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-semibold text-sm sm:text-base hover:bg-white/10 transition"
             >
               Contact Us
             </a>
           </div>
         </div>
       </div>
-
     </div>
   );
 };
@@ -303,10 +317,10 @@ const ServiceCard = ({ service }) => {
   return (
     <Link
       to={`/services/${slug}`}
-      className="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group cursor-pointer transform hover:-translate-y-1 block"
+      className="bg-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group cursor-pointer transform hover:-translate-y-1 block"
     >
       {/* Card Image/Header */}
-      <div className={`h-40 bg-gradient-to-br ${gradientColor} relative overflow-hidden`}>
+      <div className={`h-32 sm:h-40 bg-gradient-to-br ${gradientColor} relative overflow-hidden`}>
         {service.imageUrl ? (
           <img
             src={`${API_URL}${service.imageUrl}`}
@@ -316,19 +330,19 @@ const ServiceCard = ({ service }) => {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <FiActivity className="text-white/30 text-6xl" />
+            <FiActivity className="text-white/30 text-4xl sm:text-6xl" />
           </div>
         )}
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-          <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-green-600 px-4 py-2 rounded-full text-sm">
+          <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity bg-green-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
             View Details
           </span>
         </div>
         {/* Featured Badge */}
         {service.isFeatured && (
-          <div className="absolute top-3 right-3">
-            <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded">
+          <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
+            <span className="bg-yellow-400 text-yellow-900 text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
               FEATURED
             </span>
           </div>
@@ -336,21 +350,21 @@ const ServiceCard = ({ service }) => {
       </div>
 
       {/* Card Body */}
-      <div className="p-5">
-        <div className="mb-2">
-          <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded">
+      <div className="p-3 sm:p-5">
+        <div className="mb-1.5 sm:mb-2">
+          <span className="text-[10px] sm:text-xs font-medium text-green-600 bg-green-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
             {service.category || 'General'}
           </span>
         </div>
-        <h3 className="font-bold text-lg text-gray-800 mb-2 group-hover:text-green-600 transition-colors">
+        <h3 className="font-bold text-sm sm:text-lg text-gray-800 mb-1 sm:mb-2 group-hover:text-green-600 transition-colors line-clamp-2">
           {service.name}
         </h3>
         {service.description ? (
-          <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
+          <p className="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-2">
             {service.description}
           </p>
         ) : (
-          <p className="text-gray-400 text-sm italic">
+          <p className="text-gray-400 text-xs sm:text-sm italic">
             Click to learn more about this service.
           </p>
         )}

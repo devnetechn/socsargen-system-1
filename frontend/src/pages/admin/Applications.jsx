@@ -139,29 +139,29 @@ const AdminApplications = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          <div className="card text-center">
-            <p className="text-2xl font-bold text-gray-800">{stats?.total || 0}</p>
+        <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mb-8">
+          <div className="card text-center p-3 sm:p-5">
+            <p className="text-lg sm:text-2xl font-bold text-gray-800">{stats?.total || 0}</p>
             <p className="text-sm text-gray-500">Total</p>
           </div>
-          <div className="card text-center bg-yellow-50">
-            <p className="text-2xl font-bold text-yellow-600">{stats?.pending || 0}</p>
+          <div className="card text-center bg-yellow-50 p-3 sm:p-5">
+            <p className="text-lg sm:text-2xl font-bold text-yellow-600">{stats?.pending || 0}</p>
             <p className="text-sm text-yellow-700">Pending</p>
           </div>
-          <div className="card text-center bg-blue-50">
-            <p className="text-2xl font-bold text-blue-600">{stats?.reviewing || 0}</p>
+          <div className="card text-center bg-blue-50 p-3 sm:p-5">
+            <p className="text-lg sm:text-2xl font-bold text-blue-600">{stats?.reviewing || 0}</p>
             <p className="text-sm text-blue-700">Reviewing</p>
           </div>
-          <div className="card text-center bg-purple-50">
-            <p className="text-2xl font-bold text-purple-600">{stats?.interviewed || 0}</p>
+          <div className="card text-center bg-purple-50 p-3 sm:p-5">
+            <p className="text-lg sm:text-2xl font-bold text-purple-600">{stats?.interviewed || 0}</p>
             <p className="text-sm text-purple-700">Interviewed</p>
           </div>
-          <div className="card text-center bg-green-50">
-            <p className="text-2xl font-bold text-green-600">{stats?.accepted || 0}</p>
+          <div className="card text-center bg-green-50 p-3 sm:p-5">
+            <p className="text-lg sm:text-2xl font-bold text-green-600">{stats?.accepted || 0}</p>
             <p className="text-sm text-green-700">Accepted</p>
           </div>
-          <div className="card text-center bg-red-50">
-            <p className="text-2xl font-bold text-red-600">{stats?.rejected || 0}</p>
+          <div className="card text-center bg-red-50 p-3 sm:p-5">
+            <p className="text-lg sm:text-2xl font-bold text-red-600">{stats?.rejected || 0}</p>
             <p className="text-sm text-red-700">Rejected</p>
           </div>
         </div>
@@ -173,11 +173,11 @@ const AdminApplications = () => {
               <FiFilter />
               <span className="font-medium">Filters:</span>
             </div>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 w-full sm:w-auto">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="input w-auto"
+                className="input w-full sm:w-auto"
               >
                 <option value="">All Statuses</option>
                 <option value="pending">Pending</option>
@@ -189,7 +189,7 @@ const AdminApplications = () => {
               <select
                 value={jobFilter}
                 onChange={(e) => setJobFilter(e.target.value)}
-                className="input w-auto"
+                className="input w-full sm:w-auto"
               >
                 <option value="">All Jobs</option>
                 {jobs?.map((job) => (

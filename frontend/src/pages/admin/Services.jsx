@@ -116,22 +116,22 @@ const AdminServices = () => {
   const allCategories = [...new Set(services?.map(s => s.category).filter(Boolean))];
 
   return (
-    <div className="py-8">
+    <div className="py-6 sm:py-8">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Link
             to="/admin/dashboard"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-primary-600 transition mb-4"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-primary-600 transition mb-4 text-sm"
           >
             <FiArrowLeft /> Back to Dashboard
           </Link>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div>
-              <h1 className="text-2xl font-bold">Manage Services</h1>
-              <p className="text-gray-600">Create and manage hospital services displayed on the website.</p>
+              <h1 className="text-xl sm:text-2xl font-bold">Manage Services</h1>
+              <p className="text-gray-600 text-sm">Create and manage hospital services displayed on the website.</p>
             </div>
-            <button onClick={handleAdd} className="btn btn-primary flex items-center gap-2 w-fit">
+            <button onClick={handleAdd} className="btn btn-primary flex items-center justify-center gap-2 w-full sm:w-auto text-sm">
               <FiPlus /> Add Service
             </button>
           </div>
@@ -139,8 +139,25 @@ const AdminServices = () => {
 
         {/* Filter */}
         {allCategories.length > 0 && (
-          <div className="mb-6">
-            <div className="flex flex-wrap gap-2">
+          <div className="mb-4 sm:mb-6">
+            {/* Mobile: Dropdown */}
+            <div className="sm:hidden">
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="input text-sm w-full"
+              >
+                <option value="">All Categories ({services?.length || 0})</option>
+                {allCategories.map(cat => (
+                  <option key={cat} value={cat}>
+                    {cat} ({services?.filter(s => s.category === cat).length || 0})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Desktop: Pills */}
+            <div className="hidden sm:flex flex-wrap gap-2">
               <button
                 onClick={() => setFilterCategory('')}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition ${
@@ -177,17 +194,17 @@ const AdminServices = () => {
           <div className="card text-center py-12">
             <FiActivity className="mx-auto text-4xl text-gray-300 mb-4" />
             <h3 className="text-lg font-medium text-gray-700 mb-2">No Services Yet</h3>
-            <p className="text-gray-500 mb-6">Create your first service to display on the website.</p>
+            <p className="text-gray-500 mb-6 text-sm">Create your first service to display on the website.</p>
             <button onClick={handleAdd} className="btn btn-primary">
               Add First Service
             </button>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {filteredServices?.map((service) => (
               <div key={service.id} className={`card overflow-hidden ${!service.is_active ? 'opacity-60' : ''}`}>
                 {/* Service Image */}
-                <div className="h-40 bg-gradient-to-br from-primary-500 to-primary-600 relative -mx-6 -mt-6 mb-4">
+                <div className="h-32 sm:h-40 bg-gradient-to-br from-primary-500 to-primary-600 relative -mx-6 -mt-6 mb-3 sm:mb-4">
                   {service.image_url ? (
                     <img
                       src={`${API_URL}${service.image_url}`}
@@ -196,18 +213,18 @@ const AdminServices = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <FiActivity className="text-white/30 text-5xl" />
+                      <FiActivity className="text-white/30 text-4xl sm:text-5xl" />
                     </div>
                   )}
                   {/* Status badges */}
-                  <div className="absolute top-2 left-2 flex gap-2">
+                  <div className="absolute top-2 left-2 flex gap-1.5">
                     {service.is_featured && (
-                      <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
-                        <FiStar size={12} /> Featured
+                      <span className="bg-yellow-400 text-yellow-900 text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded flex items-center gap-1">
+                        <FiStar size={10} /> Featured
                       </span>
                     )}
                     {!service.is_active && (
-                      <span className="bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded">
+                      <span className="bg-gray-600 text-white text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                         Hidden
                       </span>
                     )}
@@ -215,53 +232,53 @@ const AdminServices = () => {
                 </div>
 
                 {/* Service Info */}
-                <div className="mb-4">
-                  <span className="text-xs font-medium text-primary-600 bg-primary-50 px-2 py-1 rounded">
+                <div className="mb-3 sm:mb-4">
+                  <span className="text-[10px] sm:text-xs font-medium text-primary-600 bg-primary-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                     {service.category || 'General'}
                   </span>
-                  <h3 className="font-semibold text-lg mt-2">{service.name}</h3>
+                  <h3 className="font-semibold text-base sm:text-lg mt-1.5 sm:mt-2">{service.name}</h3>
                   {service.description && (
-                    <p className="text-gray-600 text-sm mt-1 line-clamp-2">{service.description}</p>
+                    <p className="text-gray-600 text-xs sm:text-sm mt-1 line-clamp-2">{service.description}</p>
                   )}
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 pt-4 border-t">
+                <div className="flex items-center gap-1.5 sm:gap-2 pt-3 sm:pt-4 border-t">
                   <button
                     onClick={() => toggleActive.mutate({ id: service.id, isActive: !service.is_active })}
-                    className={`p-2 rounded-lg transition ${
+                    className={`p-2.5 sm:p-2 rounded-lg transition ${
                       service.is_active
                         ? 'bg-green-100 text-green-600 hover:bg-green-200'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                     title={service.is_active ? 'Hide from website' : 'Show on website'}
                   >
-                    {service.is_active ? <FiEye /> : <FiEyeOff />}
+                    {service.is_active ? <FiEye className="w-4 h-4" /> : <FiEyeOff className="w-4 h-4" />}
                   </button>
                   <button
                     onClick={() => toggleFeatured.mutate({ id: service.id, isFeatured: !service.is_featured })}
-                    className={`p-2 rounded-lg transition ${
+                    className={`p-2.5 sm:p-2 rounded-lg transition ${
                       service.is_featured
                         ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                     title={service.is_featured ? 'Remove from featured' : 'Mark as featured'}
                   >
-                    <FiStar />
+                    <FiStar className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleEdit(service)}
-                    className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
+                    className="p-2.5 sm:p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
                     title="Edit"
                   >
-                    <FiEdit2 />
+                    <FiEdit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(service.id, service.name)}
-                    className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition ml-auto"
+                    className="p-2.5 sm:p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition ml-auto"
                     title="Delete"
                   >
-                    <FiTrash2 />
+                    <FiTrash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -391,18 +408,18 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold">
+    <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 sm:p-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white z-10">
+          <h2 className="text-lg sm:text-xl font-semibold">
             {service ? 'Edit Service' : 'Add New Service'}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <FiX size={24} />
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
+            <FiX size={22} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6">
           <div className="space-y-4">
             {/* Service Name */}
             <div>
@@ -413,7 +430,7 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="input"
+                className="input text-sm"
                 placeholder="e.g., Emergency Care, Cardiac Surgery"
               />
             </div>
@@ -427,7 +444,7 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
                   value={formData.category}
                   onChange={handleCategoryChange}
                   required
-                  className="input"
+                  className="input text-sm"
                 >
                   <option value="">Select a category</option>
                   {categories?.map(cat => (
@@ -442,7 +459,7 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
                     value={newCategory}
                     onChange={handleNewCategoryChange}
                     required
-                    className="input flex-1"
+                    className="input flex-1 text-sm"
                     placeholder="Enter new category name"
                     autoFocus
                   />
@@ -453,7 +470,7 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
                       setNewCategory('');
                       setFormData({ ...formData, category: '' });
                     }}
-                    className="btn btn-secondary"
+                    className="btn btn-secondary text-sm"
                   >
                     Cancel
                   </button>
@@ -469,7 +486,7 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className="input"
+                className="input text-sm"
                 placeholder="Describe the service, what it offers, who it's for, etc."
               />
             </div>
@@ -484,7 +501,7 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
                   <img
                     src={previewUrl}
                     alt="Preview"
-                    className="w-full h-48 object-cover rounded-lg"
+                    className="w-full h-36 sm:h-48 object-cover rounded-lg"
                     onError={(e) => {
                       e.target.style.display = 'none';
                     }}
@@ -499,14 +516,14 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
                   </button>
                 </div>
               ) : (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center mb-3">
-                  <FiActivity className="mx-auto text-4xl text-gray-300 mb-2" />
-                  <p className="text-gray-500 text-sm">No image selected</p>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center mb-3">
+                  <FiActivity className="mx-auto text-3xl sm:text-4xl text-gray-300 mb-2" />
+                  <p className="text-gray-500 text-xs sm:text-sm">No image selected</p>
                 </div>
               )}
 
               {/* Upload Button */}
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -517,12 +534,12 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
                 />
                 <label
                   htmlFor="serviceImageUpload"
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 transition"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 transition text-sm"
                 >
                   <FiUpload />
                   {previewUrl ? 'Change Image' : 'Upload Image'}
                 </label>
-                <span className="text-sm text-gray-500">
+                <span className="text-xs text-gray-500 text-center sm:text-left">
                   JPEG, PNG, GIF, WebP (max 5MB)
                 </span>
               </div>
@@ -531,7 +548,7 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
             {/* Display Order */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Display Order <span className="text-gray-400">(lower numbers appear first)</span>
+                Display Order <span className="text-gray-400">(lower = first)</span>
               </label>
               <input
                 type="number"
@@ -539,12 +556,12 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
                 value={formData.displayOrder}
                 onChange={handleChange}
                 min="0"
-                className="input w-32"
+                className="input w-32 text-sm"
               />
             </div>
 
             {/* Checkboxes */}
-            <div className="flex flex-wrap gap-6">
+            <div className="flex flex-wrap gap-4 sm:gap-6">
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -575,11 +592,11 @@ const ServiceModal = ({ service, categories, onClose, onSubmit, isLoading }) => 
             </div>
           </div>
 
-          <div className="flex gap-4 mt-6 pt-6 border-t">
-            <button type="button" onClick={onClose} className="btn btn-secondary flex-1">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 mt-6 pt-6 border-t">
+            <button type="button" onClick={onClose} className="btn btn-secondary flex-1 py-2.5">
               Cancel
             </button>
-            <button type="submit" disabled={isLoading || uploading} className="btn btn-primary flex-1">
+            <button type="submit" disabled={isLoading || uploading} className="btn btn-primary flex-1 py-2.5">
               {uploading ? 'Uploading...' : isLoading ? 'Saving...' : service ? 'Update Service' : 'Add Service'}
             </button>
           </div>

@@ -192,11 +192,11 @@ const AdminAnalytics = () => {
               <h1 className="text-2xl font-bold">Analytics & Reports</h1>
               <p className="text-gray-600">Overview of hospital system performance and statistics.</p>
             </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <select
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
-              className="input w-auto"
+              className="input w-full sm:w-auto"
             >
               <option value="week">Last 7 Days</option>
               <option value="month">Last 30 Days</option>
@@ -221,7 +221,7 @@ const AdminAnalytics = () => {
         </div>
 
         {/* Overview Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-8">
           <StatCard
             title="Total Appointments"
             value={totalAppointments}
@@ -486,14 +486,14 @@ const StatCard = ({ title, value, icon, color, trend }) => {
   };
 
   return (
-    <div className={`card border ${colorClasses[color]}`}>
-      <div className="flex items-center gap-3">
-        <div className={`${iconBgClasses[color]} p-3 rounded-lg`}>
-          <span className="text-xl">{icon}</span>
+    <div className={`card border ${colorClasses[color]} p-3 sm:p-5`}>
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className={`${iconBgClasses[color]} p-2 sm:p-3 rounded-lg`}>
+          <span className="text-lg sm:text-xl">{icon}</span>
         </div>
-        <div>
-          <p className="text-sm opacity-80">{title}</p>
-          <p className="text-2xl font-bold">{value}</p>
+        <div className="min-w-0">
+          <p className="text-xs sm:text-sm opacity-80 truncate">{title}</p>
+          <p className="text-lg sm:text-2xl font-bold">{value}</p>
           {trend && (
             <p className="text-xs text-green-600 flex items-center gap-1 mt-1">
               <FiTrendingUp className="w-3 h-3" />

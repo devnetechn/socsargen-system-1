@@ -4,6 +4,11 @@ export const getBaseURL = () => {
     return import.meta.env.VITE_API_URL.replace('/api', '');
   }
   const hostname = window.location.hostname;
+  const port = window.location.port;
+  // If served from same origin (production/ngrok), use current origin
+  if (port !== '5173' && port !== '5174') {
+    return window.location.origin;
+  }
   return `http://${hostname}:5000`;
 };
 
